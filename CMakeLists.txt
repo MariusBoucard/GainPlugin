@@ -8,6 +8,8 @@ if (MSVC)
     add_compile_options(/bigobj)
 endif()
 
+
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../FRUT/prefix/FRUT/cmake")
 include(Reprojucer)
 
@@ -93,7 +95,7 @@ jucer_project_files("GainPlugin/Source/dsp"
 # Compile   Xcode     Binary    File
 #           Resource  Resource
   x         .         .         "Source/dsp/ResamplingNAM.cpp"
-  .         .         .         "Source/ResamplingNAM.h"
+  .         .         .         "Source/dsp/ResamplingNAM.h"
 )
 
 jucer_project_files("GainPlugin/Source"
@@ -265,3 +267,8 @@ jucer_export_target_configuration(
 )
 
 jucer_project_end()
+
+# Add the NeuralAmpModelerCore sublibrary
+add_subdirectory("Library/NeuralAmpModelerCore")
+# Link the NAM library to your target
+target_link_libraries(GainPlugin_Shared_Code PRIVATE NAM)

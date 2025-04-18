@@ -1,4 +1,5 @@
 #include "gui.h"
+
 #include "AmpAudioProcessor.h"
 #include <JuceHeader.h>
 int RootViewComponent::ROOT_WIDTH = 1000;
