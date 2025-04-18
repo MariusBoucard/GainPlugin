@@ -30,6 +30,32 @@
 
 #pragma once
 #include "gui.h"
+#include "NAM/dsp.h"
+
+#include "NAM/get_dsp.h"
+
+enum EParams
+{
+    // These need to be the first ones because I use their indices to place
+    // their rects in the GUI.
+    kInputLevel = 0,
+    kNoiseGateThreshold,
+    kToneBass,
+    kToneMid,
+    kToneTreble,
+    kOutputLevel,
+    // The rest is fine though.
+    kNoiseGateActive,
+    kEQActive,
+    kIRToggle,
+    // Input calibration
+    kCalibrateInput,
+    kInputCalibrationLevel,
+    kOutputMode,
+    kNumParams
+};
+
+const int numKnobs = 6;
 
 //==============================================================================
 class AmpAudioProcessor final : public AudioProcessor
@@ -37,18 +63,13 @@ class AmpAudioProcessor final : public AudioProcessor
 public:
 
     //==============================================================================
-    AmpAudioProcessor()
-        : AudioProcessor (BusesProperties().withInput  ("Input",  AudioChannelSet::stereo())
-                                           .withOutput ("Output", AudioChannelSet::stereo()))
-         , mParameters(*this, nullptr, "PARAMETERS", createParameterLayout()) // Initialize parameters
-
-    {
-        this->createEditor();
-        addParameter (gain = new AudioParameterFloat ({ "gain", 1 }, "Gain", 0.0f, 1.0f, 0.5f));
-    }
+    AmpAudioProcessor();
 
 
-    
+    double getNAMSamplerate(const std::unique_ptr<nam::DSP>& inModel);
+
+
+
 juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createParameterLayout()
 {
     // Define the gain parameter
@@ -60,15 +81,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createPar
     void prepareToPlay (double, int) override {}
     void releaseResources() override {}
 
-    void processBlock (AudioBuffer<float>& buffer, MidiBuffer&) override
-    {
-        buffer.applyGain (*gain);
-    }
+    void processBlock(AudioBuffer<float>& buffer, MidiBuffer&) override;
 
-    void processBlock (AudioBuffer<double>& buffer, MidiBuffer&) override
-    {
-        buffer.applyGain ((float) *gain);
-    }
+
 
     //==============================================================================
     AudioProcessorEditor* createEditor() override          { return new RootViewComponent (*this); }
@@ -116,7 +131,7 @@ private:
     //==============================================================================
     AudioParameterFloat* gain;
     juce::AudioProcessorValueTreeState mParameters; 
-
+    std::unique_ptr<nam::DSP> mModel;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmpAudioProcessor)
 };

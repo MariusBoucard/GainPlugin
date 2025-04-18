@@ -268,7 +268,13 @@ jucer_export_target_configuration(
 
 jucer_project_end()
 
-# Add the NeuralAmpModelerCore sublibrary
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 add_subdirectory("Library/NeuralAmpModelerCore")
-# Link the NAM library to your target
-target_link_libraries(GainPlugin_Shared_Code PRIVATE NAM)
+target_link_libraries(GainPlugin_Shared_Code PUBLIC NAM)
+
+#add_subdirectory("Library/AudioDSPTools")
+
+
+#target_link_libraries(GainPlugin_Shared_Code PUBLIC AudioDSPTools)
