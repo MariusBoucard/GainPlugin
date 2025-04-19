@@ -70,6 +70,26 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
     const int numChannels = buffer.getNumChannels();
     const int numSamples = buffer.getNumSamples();
 
+    // Calculate RMS levels
+    for (int channel = 0; channel < isMono; ++channel)
+    {
+        auto* channelData = buffer.getReadPointer(channel);
+        float sum = 0.0f;
+
+        for (int i = 0; i < numSamples; ++i)
+        {
+            sum += channelData[i] * channelData[i];
+        }
+
+        float rms = std::sqrt(sum / numSamples);
+
+        // Update the atomic variables
+        if (channel == 0)
+        {
+            mRmsLevelLeft.store(rms);
+            mRmsLevelRight.store(rms);
+        }
+    }
 
     if (!mFloatBuffer)
     {
@@ -145,4 +165,27 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
     }
 
     buffer.applyGain(mParameters.getParameterAsValue("output").getValue()); 
+
+    for (int channel = 0; channel < numChannels; ++channel)
+    {
+        auto* channelData = buffer.getReadPointer(channel);
+        float sum = 0.0f;
+
+        for (int i = 0; i < numSamples; ++i)
+        {
+            sum += channelData[i] * channelData[i];
+        }
+
+        float rms = std::sqrt(sum / numSamples);
+
+        // Update the atomic variables
+        if (channel == 0)
+        {
+            mRmsOutputLevelLeft.store(rms);
+        }
+        if (channel == 1)
+        {
+            mRmsOutputLevelRight.store(rms);
+        }
+    }
 }

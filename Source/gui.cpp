@@ -7,6 +7,8 @@ int RootViewComponent::ROOT_HEIGHT = 550;
 
 RootViewComponent::RootViewComponent(juce::AudioProcessor& processor)
     : AudioProcessorEditor(processor)
+    , mInputMeter(processor)
+    , mOutputMeter(processor,false)
 {
     auto& gainProcessor = processor; 
 
@@ -28,6 +30,7 @@ RootViewComponent::RootViewComponent(juce::AudioProcessor& processor)
 void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
 {
     auto bounds = getLocalBounds();
+
     AmpAudioProcessor* ampAudioProcessor = dynamic_cast<AmpAudioProcessor*>(&inProcessor);
 
     mInputKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
@@ -74,13 +77,24 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
         				  mOutputKnobLayout.outLayout.y,
         				  mOutputKnobLayout.outLayout.sliderWidth,
         				  mOutputKnobLayout.outLayout.sliderHeight);
+mInputMeter.setBounds(mInputMeterLayout.outLayout.x,
+						  mInputMeterLayout.outLayout.y,
+						  mInputMeterLayout.outLayout.sliderWidth,
+						  mInputMeterLayout.outLayout.sliderHeight);
+mOutputMeter.setBounds(mOutputMeterLayout.outLayout.x,
+						  mOutputMeterLayout.outLayout.y,
+						  mOutputMeterLayout.outLayout.sliderWidth,
+						  mOutputMeterLayout.outLayout.sliderHeight);
 
 
+    addAndMakeVisible(mInputMeter);
     addAndMakeVisible(mInputKnob);
     addAndMakeVisible(mBassKnob);
     addAndMakeVisible(mMidKnob);
     addAndMakeVisible(mHighKnob);
     addAndMakeVisible(mOutputKnob);
+    addAndMakeVisible(mOutputMeter);
+   
 
     mInputKnob.setLookAndFeel(&mKnobLookAndFeel);
     mBassKnob.setLookAndFeel(&mKnobLookAndFeel);
@@ -123,4 +137,43 @@ void RootViewComponent::resized()
 
     //mInputKnob.setBounds(bounds.getCentreX() - 50, bounds.getCentreY() - 50, 100, 100); // 100x100 knob
     // Handle resizing logic if needed
+}
+
+void RootViewComponent::MeterComponent::paint(juce::Graphics& g)
+{
+    
+
+        AmpAudioProcessor& meter = static_cast<AmpAudioProcessor&>(audioProcessor);
+        float rmsLeft = 0.0f;
+        float rmsRight = 0.0f;
+
+        if (isInput)
+        {
+            rmsLeft = meter.getRmsLevelLeft();
+            rmsRight = meter.getRmsLevelRight();
+            g.setColour(juce::Colours::white);
+            rmsLeft = rmsLeft * 100;
+
+        }
+        else
+        {
+			rmsLeft = meter.getRmsOutputLevelLeft();
+			rmsRight = meter.getRmsOutputLevelRight();
+            g.setColour(juce::Colours::green);
+            rmsLeft = rmsLeft*10;
+
+        }
+
+        juce::Rectangle<float> meterBounds(0, 0, getWidth(), getHeight());
+        juce::Rectangle<float> leftMeterBounds(0, getHeight() - (rmsLeft * getHeight()), getWidth() / 2, rmsLeft * getHeight());
+        g.fillRect(juce::Rectangle<float>(10, 10, 10, rmsLeft * getHeight()));
+      //  g.setColour(juce::Colours::blue);
+
+   //     g.fillRect(juce::Rectangle<float>(50, getHeight() - (rmsLeft * getHeight()), 20, rmsLeft * getHeight()));
+
+    
+
+	// Draw the meter
+	g.setColour(juce::Colours::blue);
+	//g.fillRect(getLocalBounds().toFloat().reduced(10)); // Draw a rectangle for the meter
 }

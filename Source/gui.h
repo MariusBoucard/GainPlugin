@@ -71,12 +71,30 @@ public:
                 mOutputKnobLayout.inLayout.textboxHeight = 20;
                 mOutputKnobLayout.inLayout.textboxPadding = 10;
 
+                mInputMeterLayout.inLayout.x = 100;
+                mInputMeterLayout.inLayout.y = 235;
+				mInputMeterLayout.inLayout.frameWidth = 135;
+                mInputMeterLayout.inLayout.frameHeight = 153;
+                mInputMeterLayout.inLayout.ratio = 0.5f;
+				mInputMeterLayout.inLayout.textboxHeight = 20;
+                mInputMeterLayout.inLayout.textboxPadding = 10;
 
+                mOutputMeterLayout.inLayout.x = 750;
+                mOutputMeterLayout.inLayout.y = 235;
+				mOutputMeterLayout.inLayout.frameWidth = 135;
+                mOutputMeterLayout.inLayout.frameHeight = 153;
+				mOutputMeterLayout.inLayout.ratio = 0.5f;
+                mOutputMeterLayout.inLayout.textboxHeight = 20;
+				mOutputMeterLayout.inLayout.textboxPadding = 10;
+
+
+                computeKnobLayout(mInputMeterLayout);
                 computeKnobLayout(mInputKnobLayout);
                 computeKnobLayout(mBassKnobLayout);
                 computeKnobLayout(mMidKnobLayout);
                 computeKnobLayout(mHighKnobLayout);
                 computeKnobLayout(mOutputKnobLayout);
+                computeKnobLayout(mOutputMeterLayout);
     }
 
     void computeKnobLayout(KnobLayout& inKnobLayout)
@@ -92,8 +110,36 @@ public:
     void paint(juce::Graphics& g) override;
     void resized() override;
 
+    class MeterComponent : public juce::Component, private juce::Timer
+    {
+    public:
+        MeterComponent(juce::AudioProcessor& processor, bool isInput = true)
+            : audioProcessor(processor)
+            , isInput(isInput)
+        {
+            startTimerHz(30);
+        }
+
+        void paint(juce::Graphics& g) override;
+
+
+    private:
+        bool isInput;
+        juce::AudioProcessor& audioProcessor;
+
+        void timerCallback() override
+        {
+            repaint();
+        }
+    };
 private:
     juce::Image mImage;
+    MeterComponent mInputMeter;
+    KnobLayout mInputMeterLayout;
+
+    MeterComponent mOutputMeter;
+	KnobLayout mOutputMeterLayout;
+
 
     juce::Slider mInputKnob;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mInputAttachment;

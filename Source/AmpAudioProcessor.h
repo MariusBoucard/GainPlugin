@@ -145,6 +145,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createPar
       //  mParameters.setStateInformation (data, sizeInBytes);
     }
 
+    double getRmsLevelLeft() const { return mRmsLevelLeft.load(); }
+    double getRmsLevelRight() const { return mRmsLevelRight.load(); }
+    double getRmsOutputLevelLeft() const { return mRmsOutputLevelLeft.load(); }
+	double getRmsOutputLevelRight() const { return mRmsOutputLevelRight.load(); }
+
     //==============================================================================
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override
     {
@@ -174,6 +179,12 @@ private:
     double** mTempDoubleBuffer = nullptr;
 
     ParamListener mParamListener;
+
+    private:
+        std::atomic<float> mRmsLevelLeft{ 0.0f };
+        std::atomic<float> mRmsLevelRight{ 0.0f };
+        std::atomic<float> mRmsOutputLevelLeft{ 0.0f };
+        std::atomic<float> mRmsOutputLevelRight{ 0.0f };
 
     double mBlockSize;
     double mSampleRate;
