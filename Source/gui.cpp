@@ -165,7 +165,7 @@ void RootViewComponent::MeterComponent::paint(juce::Graphics& g)
             rmsLeft = meter.getRmsLevelLeft();
             rmsRight = meter.getRmsLevelRight();
             g.setColour(juce::Colours::white);
-            rmsLeft = rmsLeft * 100;
+            rmsLeft = rmsLeft * 10;
 
         }
         else
@@ -179,7 +179,7 @@ void RootViewComponent::MeterComponent::paint(juce::Graphics& g)
 
         juce::Rectangle<float> meterBounds(0, 0, getWidth(), getHeight());
         juce::Rectangle<float> leftMeterBounds(0, getHeight() - (rmsLeft * getHeight()), getWidth() / 2, rmsLeft * getHeight());
-        g.fillRect(juce::Rectangle<float>(10, 10, 10, rmsLeft * getHeight()));
+        g.fillRect(juce::Rectangle<float>(10, 10, 3, rmsLeft * getHeight()));
       //  g.setColour(juce::Colours::blue);
 
    //     g.fillRect(juce::Rectangle<float>(50, getHeight() - (rmsLeft * getHeight()), 20, rmsLeft * getHeight()));

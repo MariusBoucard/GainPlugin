@@ -80,17 +80,17 @@ public:
                 mOutputKnobLayout.inLayout.textboxPadding = 10;
 
                 mInputMeterLayout.inLayout.x = 100;
-                mInputMeterLayout.inLayout.y = 235;
-				mInputMeterLayout.inLayout.frameWidth = 135;
-                mInputMeterLayout.inLayout.frameHeight = 153;
+                mInputMeterLayout.inLayout.y = 225;
+				mInputMeterLayout.inLayout.frameWidth = 70;
+                mInputMeterLayout.inLayout.frameHeight = 60;
                 mInputMeterLayout.inLayout.ratio = 0.5f;
 				mInputMeterLayout.inLayout.textboxHeight = 20;
                 mInputMeterLayout.inLayout.textboxPadding = 10;
 
                 mOutputMeterLayout.inLayout.x = 750;
-                mOutputMeterLayout.inLayout.y = 235;
-				mOutputMeterLayout.inLayout.frameWidth = 135;
-                mOutputMeterLayout.inLayout.frameHeight = 153;
+                mOutputMeterLayout.inLayout.y = 225;
+				mOutputMeterLayout.inLayout.frameWidth = 70;
+                mOutputMeterLayout.inLayout.frameHeight = 60;
 				mOutputMeterLayout.inLayout.ratio = 0.5f;
                 mOutputMeterLayout.inLayout.textboxHeight = 20;
 				mOutputMeterLayout.inLayout.textboxPadding = 10;
