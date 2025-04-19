@@ -33,7 +33,6 @@ void dsp::tone_stack::BasicNamToneStack::SetParam(const std::string name, const 
   }
   else if (name == "middle")
   {
-    // HACK: Store for refresh
     mMiddleVal = val;
     const double sampleRate = GetSampleRate();
     const double midGainDB = 10 * (val - 0.5); // +/- 10

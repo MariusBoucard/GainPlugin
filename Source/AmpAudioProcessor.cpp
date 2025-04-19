@@ -92,7 +92,6 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
             mTempDoubleBuffer[channel] = new double[1024];
 		}
     }
-   // Copy float data from buffer to double**
     for (int channel = 0; channel < isMono; ++channel)
     {
         auto* floatData = buffer.getReadPointer(channel);
@@ -122,9 +121,7 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
     
 
 
-   // //// Set tone stack parameters
 
-   // //// Process the tone stack
     mDoubleBuffer = mToneStack->Process(mTempDoubleBuffer, isMono, numSamples);
 
     for (int channel = 0; channel < isMono; ++channel)
@@ -133,21 +130,12 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
 			return static_cast<float>(sample);
 		});
 	}
-   // ////// Copy processed data back to the buffer
-   // 
-    for (int channel = 0; channel < isMono; ++channel)
+       for (int channel = 0; channel < isMono; ++channel)
     {
         auto* floatData = buffer.getWritePointer(channel);
         std::copy(mTempFloatBuffer[channel], mTempFloatBuffer[channel] + numSamples, floatData);
     }
 
-   // for (int channel = 0; channel < isMono; ++channel)
-   // {
-   //     auto* floatData = buffer.getWritePointer(channel);
-   //     std::copy(mTempFloatBuffer[channel], mTempFloatBuffer[channel] + numSamples, floatData);
-   // }
-
-   // //// Handle mono-to-stereo processing
     bool mMonoToStereo = true;
     if (mMonoToStereo && numChannels > 1)
     {
