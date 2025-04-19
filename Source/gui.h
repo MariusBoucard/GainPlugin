@@ -1,5 +1,6 @@
 #pragma once
 #include "looknfeel/StripKnob_look_n_feel.h"
+#include "looknfeel/ToogleButtonLookAndFeel.h"
 #include <JuceHeader.h>
 
 class RootViewComponent : public juce::AudioProcessorEditor
@@ -259,5 +260,7 @@ private:
     juce::FileChooser mFileChooser;
 
     KnobLookAndFeel mKnobLookAndFeel; 
+    ToggleButtonLookAndFeel mToggleButtonLookAndFeel; // Custom LookAndFeel
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RootViewComponent)
 };

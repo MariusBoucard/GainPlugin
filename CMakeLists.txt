@@ -75,6 +75,7 @@ jucer_project_files("GainPlugin/looknfeel"
 # Compile   Xcode     Binary    File
 #           Resource  Resource
   .         .         .         "Source/looknfeel/StripKnob_look_n_feel.h"
+  .         .         .         "Source/looknfeel/ToogleButtonLookAndFeel.h"        
 )
 
 jucer_project_files("GainPlugin/ressources"

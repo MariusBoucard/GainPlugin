@@ -54,10 +54,8 @@ public:
         bounds.setX(15);
         bounds.setWidth(bounds.getWidth() -15);
 
-        // Draw the background
         g.setColour(juce::Colours::darkgrey);
         g.fillRect(bounds);
-        // Draw the border
         g.setColour(juce::Colours::limegreen);
         g.drawRect(bounds, 2.0f); // Border thickness of 2.0f
 

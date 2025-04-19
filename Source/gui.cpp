@@ -167,6 +167,8 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
     mHighKnob.setLookAndFeel(&mKnobLookAndFeel);
     mOutputKnob.setLookAndFeel(&mKnobLookAndFeel);
     mVerbMixKnob.setLookAndFeel(&mKnobLookAndFeel);
+    mFileChooserButton.setLookAndFeel(&mToggleButtonLookAndFeel);
+    mNAMChooserButton.setLookAndFeel(&mToggleButtonLookAndFeel);
 
     mInputKnob.setValue(0.5);
     mGateKnob.setValue(0.5);
