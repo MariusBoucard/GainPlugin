@@ -29,16 +29,14 @@ public:
 
     void drawButtonText(juce::Graphics& g, juce::TextButton& button, bool isMouseOverButton, bool isButtonDown) override
     {
-        // Set the text color based on hover state
         juce::Colour textColour = juce::Colours::white;
         if (isMouseOverButton)
         {
-            textColour = juce::Colours::black; // Change text color to black when hovered
+            textColour = juce::Colours::black; 
         }
 
         g.setColour(textColour);
 
-        // Draw the text centered in the button
-        g.drawText(button.getButtonText(), button.getLocalBounds(), juce::Justification::centred, true);
+            g.drawText(button.getButtonText(), button.getLocalBounds(), juce::Justification::centred, true);
     }
 };
