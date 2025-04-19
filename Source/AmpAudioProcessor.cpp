@@ -39,7 +39,7 @@ AmpAudioProcessor::AmpAudioProcessor()
     , mIsNAMEnabled(true)
     , mIsIRActive(false)
     , mIRPath(createJucePathFromFile("D:\\Projets musique\\vst\\Amps\\Revv V30 Fredman Impulse Response\\Wav\\Revv.wav"))
-    , mIRVerbPath(createJucePathFromFile("D:\\Projets musique\\vst\\Amps\\Revv V30 Fredman Impulse Response\\Wav\\Revv.wav"))
+    , mIRVerbPath(createJucePathFromFile("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\ressources\\verbIR\\HallVerb.wav"))
 {
     mNoiseGateTrigger->AddListener(mNoiseGateGain);
 
