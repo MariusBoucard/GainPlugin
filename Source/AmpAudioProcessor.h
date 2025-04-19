@@ -194,6 +194,19 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createPar
         return mParameters;
     }
 
+    juce::File& getIRPath()
+	{
+		return mIRPath;
+	}
+    juce::File& getIRVerbPath()
+    {
+        return mIRVerbPath;
+    }
+    juce::File& getNAMPath()
+	{
+		return mNAMPath;
+	}
+
 private:
     //==============================================================================
     AudioParameterFloat* gain;
@@ -210,6 +223,7 @@ private:
 
     juce::File mIRPath;
     juce::File mIRVerbPath;
+    juce::File mNAMPath;
 
     bool mIsIRActive;
     bool mIsNAMEnabled;

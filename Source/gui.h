@@ -254,8 +254,13 @@ private:
     juce::TextButton mFileChooserButton;
     KnobLayout mFileChooserButtonLayout;
 
-    juce::TextButton mNAMChooserButton;
+    juce::OwnedArray<juce::File> mNAMFileList;
     KnobLayout mNAMChooserButtonLayout;
+    juce::ComboBox mNAMChooserButton;
+
+    juce::OwnedArray<juce::File> mIRFileList;
+
+
 
     juce::FileChooser mFileChooser;
 

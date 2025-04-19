@@ -16,7 +16,7 @@
 juce::File createJucePathFromFile(const juce::String& filePath)
 {
     juce::File file(filePath); // Create a juce::File object from the file path
-    if (!file.existsAsFile())
+    if (!file.existsAsFile() and !file.exists())
     {
         DBG("File does not exist: " << filePath);
         return juce::File(); // Return an empty file if it doesn't exist
@@ -40,6 +40,7 @@ AmpAudioProcessor::AmpAudioProcessor()
     , mIsIRActive(false)
     , mIRPath(createJucePathFromFile("D:\\Projets musique\\vst\\Amps\\Revv V30 Fredman Impulse Response\\Wav\\Revv.wav"))
     , mIRVerbPath(createJucePathFromFile("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\ressources\\verbIR\\HallVerb.wav"))
+    , mNAMPath(createJucePathFromFile("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\ressources\\namModels\\Fender"))
 {
     mNoiseGateTrigger->AddListener(mNoiseGateGain);
 
