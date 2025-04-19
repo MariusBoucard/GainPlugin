@@ -63,18 +63,14 @@ AmpAudioProcessor::AmpAudioProcessor()
     mParameters.addParameterListener("high", &mParamListener);
     mParameters.addParameterListener("gate", &mParamListener);
     
-   // mNoiseGateGain.SetGainReductionDB(0.0f); // Set initial gain reduction to 0 dB
     mToneStack->Reset(getSampleRate(), getBlockSize());
-    mModel = nam::get_dsp(std::filesystem::path("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\Library\\NeuralAmpModelerCore\\example_models\\Metal lead.nam"));//loadModel("kk");
-    stageIR(mIRPath); 
-    bool activeIR = true;
-    if (mStagedIR != nullptr and activeIR)
-    {
-        mIR = std::move(mStagedIR);
-        mStagedIR = nullptr;
-    }
+
+    mModel = nam::get_dsp(std::filesystem::path("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\Library\\NeuralAmpModelerCore\\example_models\\Metal lead.nam"));
+    mModel->ResetAndPrewarm(mSampleRate, mBlockSize);
+
+    loadImpulseResponse(mIRPath);
+
     this->createEditor();
-    mModel->ResetAndPrewarm(mSampleRate, mBlockSize); // Set the sample rate and block size
 }
 AmpAudioProcessor::~AmpAudioProcessor()
 {
@@ -176,7 +172,7 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
 
     mDoubleBuffer = mToneStack->Process(mTempDoubleBuffer, isMono, numSamples);
 
-    if (mIR != nullptr) // TODO add param to trigger path
+    if (mIR != nullptr and mParameters.getParameterAsValue("irEnabled").getValue()) // TODO add param to trigger path
         mTempDoubleBuffer = mIR->Process(mDoubleBuffer, isMono, numSamples);
     else
     {
@@ -233,11 +229,35 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
         }
     }
 }
+void AmpAudioProcessor::loadImpulseResponse(const juce::File& inIRFile)
+{
+    stageIR(inIRFile);
+    if (mStagedIR != nullptr)
+	{
+		mIR = std::move(mStagedIR);
+		mStagedIR = nullptr;
+	}
+	else
+	{
+		std::cerr << "Failed to load impulse response." << std::endl;
+	}
+}
+
+void AmpAudioProcessor::loadNAMFile(const juce::File& inNAMFile)
+{
+	try
+	{
+		mModel = nam::get_dsp(std::filesystem::path(inNAMFile.getFullPathName().toStdString()));
+		mModel->ResetAndPrewarm(mSampleRate, mBlockSize); // Set the sample rate and block size
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << "Error loading NAM file: " << e.what() << std::endl;
+	}
+}
 
 dsp::wav::LoadReturnCode AmpAudioProcessor::stageIR(const juce::File& irPath)
 {
-    // FIXME it'd be better for the path to be "staged" as well. Just in case the
-    // path and the model got caught on opposite sides of the fence...
     juce::File previousIRPath = mIRPath;
     const double sampleRate = getSampleRate();
     dsp::wav::LoadReturnCode wavState = dsp::wav::LoadReturnCode::ERROR_OTHER;

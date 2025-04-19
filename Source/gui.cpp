@@ -2,14 +2,18 @@
 
 #include "AmpAudioProcessor.h"
 #include <JuceHeader.h>
-int RootViewComponent::ROOT_WIDTH = 1000;
+int RootViewComponent::ROOT_WIDTH = 980;
 int RootViewComponent::ROOT_HEIGHT = 550;
 
 RootViewComponent::RootViewComponent(juce::AudioProcessor& processor)
     : AudioProcessorEditor(processor)
     , mInputMeter(processor)
     , mOutputMeter(processor,false)
+    , mFileChooser("choose NAM file")
+
 {
+
+
     auto& gainProcessor = processor; 
 
     auto imageData = BinaryData::plate_png;
@@ -34,12 +38,18 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
 
     AmpAudioProcessor* ampAudioProcessor = dynamic_cast<AmpAudioProcessor*>(&inProcessor);
 
+    mFileChooserButton.setButtonText("Load IR :");
+    mFileChooserButton.onClick = [this]() { openFileChooser(); };
+    mNAMChooserButton.setButtonText("Load NAM :");
+    mNAMChooserButton.onClick = [this]() { openNAMFileChooser(); };
+
     mInputKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mBassKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mMidKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mHighKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mOutputKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mGateKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+    mIRButton.setButtonText("IR");
    
 
     mInputKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mInputKnobLayout.inLayout.textboxHeight);
@@ -61,13 +71,15 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
         ampAudioProcessor->getCustomParameterTree(), "output", mOutputKnob);
     mGateKnobAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
     ampAudioProcessor->getCustomParameterTree(), "gate", mGateKnob);
-
+    mIRButtonAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+		ampAudioProcessor->getCustomParameterTree(), "irEnabled", mIRButton);
+    
 
     mInputKnob.setBounds(mInputKnobLayout.outLayout.x,
                          mInputKnobLayout.outLayout.y,
                          mInputKnobLayout.outLayout.sliderWidth,
                          mInputKnobLayout.outLayout.sliderHeight);
-mGateKnob.setBounds(mGateKnobLayout.outLayout.x,
+    mGateKnob.setBounds(mGateKnobLayout.outLayout.x,
                     mGateKnobLayout.outLayout.y,
 						mGateKnobLayout.outLayout.sliderWidth,
 						mGateKnobLayout.outLayout.sliderHeight);
@@ -87,14 +99,30 @@ mGateKnob.setBounds(mGateKnobLayout.outLayout.x,
         				  mOutputKnobLayout.outLayout.y,
         				  mOutputKnobLayout.outLayout.sliderWidth,
         				  mOutputKnobLayout.outLayout.sliderHeight);
-mInputMeter.setBounds(mInputMeterLayout.outLayout.x,
+    mInputMeter.setBounds(mInputMeterLayout.outLayout.x,
 						  mInputMeterLayout.outLayout.y,
 						  mInputMeterLayout.outLayout.sliderWidth,
 						  mInputMeterLayout.outLayout.sliderHeight);
-mOutputMeter.setBounds(mOutputMeterLayout.outLayout.x,
+    mOutputMeter.setBounds(mOutputMeterLayout.outLayout.x,
 						  mOutputMeterLayout.outLayout.y,
 						  mOutputMeterLayout.outLayout.sliderWidth,
 						  mOutputMeterLayout.outLayout.sliderHeight);
+
+	mIRButton.setBounds(mIRButtonLayout.outLayout.x,
+						mIRButtonLayout.outLayout.y,
+						mIRButtonLayout.outLayout.sliderWidth,
+						mIRButtonLayout.outLayout.sliderHeight);
+
+    mFileChooserButton.setBounds(mFileChooserButtonLayout.outLayout.x,
+                                mFileChooserButtonLayout.outLayout.y,
+                                mFileChooserButtonLayout.outLayout.sliderWidth,
+                                mFileChooserButtonLayout.outLayout.sliderHeight);
+    mNAMChooserButton.setBounds(mNAMChooserButtonLayout.outLayout.x,
+                                mNAMChooserButtonLayout.outLayout.y,
+                                mNAMChooserButtonLayout.outLayout.sliderWidth,
+                                mNAMChooserButtonLayout.outLayout.sliderHeight);
+
+
 
 
     addAndMakeVisible(mInputMeter);
@@ -105,6 +133,9 @@ mOutputMeter.setBounds(mOutputMeterLayout.outLayout.x,
     addAndMakeVisible(mHighKnob);
     addAndMakeVisible(mOutputKnob);
     addAndMakeVisible(mOutputMeter);
+    addAndMakeVisible(mIRButton);
+    addAndMakeVisible(mFileChooserButton);
+    addAndMakeVisible(mNAMChooserButton);
    
 
     mInputKnob.setLookAndFeel(&mKnobLookAndFeel);
@@ -122,9 +153,49 @@ mOutputMeter.setBounds(mOutputMeterLayout.outLayout.x,
     mOutputKnob.setValue(0.5);
 }
 
+void RootViewComponent::handleSelectedFile(const juce::File& file)
+{
+    DBG("Handling file: " << file.getFullPathName());
+    AmpAudioProcessor& audioProcessor = static_cast<AmpAudioProcessor&>(processor);
+    audioProcessor.loadImpulseResponse(file);
+    std::string filePath = file.getFullPathName().toStdString();
+    mFileChooserButton.setButtonText("Load IR : "+ filePath);
+
+}
+void RootViewComponent::openFileChooser()
+{
+    juce::FileChooser chooser("Select an Impulse Response File",
+        juce::File{},
+        "*.wav");
+
+    if (chooser.browseForFileToOpen())
+    {
+        handleSelectedFile(chooser.getResult());
+    }
+}
+
+void RootViewComponent::openNAMFileChooser()
+{
+    juce::FileChooser chooser("Select NAM File",
+        juce::File{},
+        "*.nam");
+
+    if (chooser.browseForFileToOpen())
+    {
+        handleSelectedNAMFile(chooser.getResult());
+    }
+}
+void RootViewComponent::handleSelectedNAMFile(const juce::File& file)
+{
+	DBG("Handling NAM file: " << file.getFullPathName());
+	AmpAudioProcessor& audioProcessor = static_cast<AmpAudioProcessor&>(processor);
+	audioProcessor.loadNAMFile(file);
+	std::string filePath = file.getFullPathName().toStdString();
+	mNAMChooserButton.setButtonText("Load NAM : "+ filePath);
+}
 void RootViewComponent::paint(juce::Graphics& g)
 {
-    g.fillAll(juce::Colours::black); // Fill background with black
+    g.fillAll(juce::Colours::black);
 
     if (!mImage.isNull())
     {

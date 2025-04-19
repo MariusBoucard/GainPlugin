@@ -82,6 +82,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createPar
     params.push_back(std::make_unique<juce::AudioParameterFloat>("mid", "Mid", 0.0f, 1.0f, 0.5f));
     params.push_back(std::make_unique<juce::AudioParameterFloat>("high", "High", 0.0f, 1.0f, 0.5f));
     params.push_back(std::make_unique<juce::AudioParameterFloat>("output", "Output", 0.0f, 1.0f, 0.5f));
+    params.push_back(std::make_unique<juce::AudioParameterBool>("irEnabled", "IREnabled", false));
 
     return { params.begin(), params.end() };
 }
@@ -110,6 +111,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createPar
     const String getProgramName (int) override             { return "None"; }
     void changeProgramName (int, const String&) override   {}
 
+    void loadImpulseResponse(const juce::File& path);
+    void loadNAMFile(const juce::File& path);
     dsp::wav::LoadReturnCode stageIR(const juce::File& path);
 	
     class ParamListener : public juce::AudioProcessorValueTreeState::Listener
@@ -197,6 +200,7 @@ private:
     std::unique_ptr<dsp::ImpulseResponse> mIR;
     std::unique_ptr<dsp::ImpulseResponse> mStagedIR;
     juce::File mIRPath;
+    bool mIsIRActive;
 
     float** mFloatBuffer = nullptr; 
     float** mTempFloatBuffer = nullptr; 
