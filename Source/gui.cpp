@@ -38,9 +38,6 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
 
     AmpAudioProcessor* ampAudioProcessor = dynamic_cast<AmpAudioProcessor*>(&inProcessor);
 
-    mFileChooserButton.setButtonText("Load IR :");
-    mFileChooserButton.onClick = [this]() { openFileChooser(); };
-    
     DirectoryIterator iter(ampAudioProcessor->getNAMPath(), false, "*", juce::File::findFiles);
     int itemId = 1;
 
@@ -50,8 +47,10 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
         mNAMFileList.add(new juce::File(file));
         mNAMChooserButton.addItem(file.getFileName(), itemId++);
     }
+
     mNAMChooserButton.setTextWhenNothingSelected("Select NAM File");
     mNAMChooserButton.setJustificationType(juce::Justification::centred);
+
 	mNAMChooserButton.onChange = [this, ampAudioProcessor]() {
         int selectedId = mNAMChooserButton.getSelectedId();
         if (selectedId > 0 && selectedId <= mNAMFileList.size())
@@ -61,8 +60,27 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
         }
 	};
 
-    //mNAMChooserButton.set("Load NAM :");
-    //mNAMChooserButton.onClick = [this]() { openNAMFileChooser(); };*/
+    DirectoryIterator iter2(ampAudioProcessor->getIRPath(), false, "*", juce::File::findFiles);
+    int itemId2 = 1;
+
+    while (iter2.next())
+    {
+        auto file = iter2.getFile();
+        mIRFileList.add(new juce::File(file));
+        mFileChooserButton.addItem(file.getFileName(), itemId2++);
+    }
+
+    mFileChooserButton.setTextWhenNothingSelected("Select IR File");
+    mFileChooserButton.setJustificationType(juce::Justification::centred);
+
+    mFileChooserButton.onChange = [this, ampAudioProcessor]() {
+        int selectedId = mFileChooserButton.getSelectedId();
+        if (selectedId > 0 && selectedId <= mIRFileList.size())
+        {
+            juce::File selectedFile = *mIRFileList[selectedId - 1];
+            handleSelectedFile(selectedFile);
+        }
+     };
 
     mInputKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mBassKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
@@ -205,9 +223,6 @@ void RootViewComponent::handleSelectedFile(const juce::File& file)
     DBG("Handling file: " << file.getFullPathName());
     AmpAudioProcessor& audioProcessor = static_cast<AmpAudioProcessor&>(processor);
     audioProcessor.loadImpulseResponse(file);
-    std::string filePath = file.getFullPathName().toStdString().substr(file.getFullPathName().length() - 20, file.getFullPathName().length());
-    mFileChooserButton.setButtonText("Load IR : "+ filePath);
-
 }
 void RootViewComponent::openFileChooser()
 {
@@ -237,7 +252,6 @@ void RootViewComponent::handleSelectedNAMFile(const juce::File& file)
 	DBG("Handling NAM file: " << file.getFullPathName());
 	AmpAudioProcessor& audioProcessor = static_cast<AmpAudioProcessor&>(processor);
 	audioProcessor.loadNAMFile(file);
-    std::string filePath = file.getFullPathName().toStdString().substr(file.getFullPathName().length() - 20, file.getFullPathName().length());
 }
 
 void RootViewComponent::paint(juce::Graphics& g)

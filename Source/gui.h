@@ -251,7 +251,7 @@ private:
 	std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> mNAMButtonAttachment;
     KnobLayout mNAMButtonLayout;
 
-    juce::TextButton mFileChooserButton;
+    juce::ComboBox mFileChooserButton;
     KnobLayout mFileChooserButtonLayout;
 
     juce::OwnedArray<juce::File> mNAMFileList;

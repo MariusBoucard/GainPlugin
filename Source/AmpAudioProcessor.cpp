@@ -38,7 +38,7 @@ AmpAudioProcessor::AmpAudioProcessor()
     , mParamListener(mToneStack, mNoiseGateGain, mNoiseGateTrigger)
     , mIsNAMEnabled(true)
     , mIsIRActive(false)
-    , mIRPath(createJucePathFromFile("D:\\Projets musique\\vst\\Amps\\Revv V30 Fredman Impulse Response\\Wav\\Revv.wav"))
+    , mIRPath(createJucePathFromFile("D:\\Projets musique\\vst\\Amps\\Revv V30 Fredman Impulse Response\\Wav\\"))
     , mIRVerbPath(createJucePathFromFile("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\ressources\\verbIR\\HallVerb.wav"))
     , mNAMPath(createJucePathFromFile("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\ressources\\namModels\\Fender"))
 {
