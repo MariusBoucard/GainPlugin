@@ -34,9 +34,9 @@ class BasicNamToneStack : public AbstractToneStack
 public:
   BasicNamToneStack()
   {
-    SetParam("bass", 5.0);
-    SetParam("middle", 5.0);
-    SetParam("high", 5.0);
+    SetParam("bass", 0.5);
+    SetParam("middle", 0.5);
+    SetParam("high", 0.5);
   };
   ~BasicNamToneStack() = default;
 
@@ -52,9 +52,9 @@ protected:
   recursive_linear_filter::HighShelf mToneTreble;
 
   // HACK not DRY w knob defs
-  double mBassVal = 5.0;
-  double mMiddleVal = 5.0;
-  double mTrebleVal = 5.0;
+  double mBassVal = 0.5;
+  double mMiddleVal = 0.5;
+  double mTrebleVal = 0.5;
 };
 }; // namespace tone_stack
 }; // namespace dsp

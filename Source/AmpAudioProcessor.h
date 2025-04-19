@@ -65,7 +65,7 @@ public:
     //==============================================================================
     AmpAudioProcessor();
 
-
+    ~AmpAudioProcessor() override;
     double getNAMSamplerate(const std::unique_ptr<nam::DSP>& inModel);
 
 
@@ -108,6 +108,31 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createPar
     const String getProgramName (int) override             { return "None"; }
     void changeProgramName (int, const String&) override   {}
 
+    class ParamListener : public juce::AudioProcessorValueTreeState::Listener
+    {
+    public:
+        ParamListener(dsp::tone_stack::AbstractToneStack* toneStack)
+            : mToneStack(toneStack) {}
+
+        void parameterChanged(const juce::String& parameterID, float newValue) override
+        {
+            if (parameterID == "bass")
+            {
+                mToneStack->SetParam("bass", newValue);
+            }
+            else if (parameterID == "mid")
+            {
+                mToneStack->SetParam("middle", newValue);
+            }
+            else if (parameterID == "high")
+            {
+                mToneStack->SetParam("high", newValue);
+            }
+        }
+
+    private:
+        dsp::tone_stack::AbstractToneStack* mToneStack; // Pointer to the tone stack
+    };
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override
     {
@@ -116,6 +141,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createPar
 
     void setStateInformation (const void* data, int sizeInBytes) override
     {
+        //MemoryInputStream (data, sizeInBytes, false).readFloat (*mParameters);
       //  mParameters.setStateInformation (data, sizeInBytes);
     }
 
@@ -139,10 +165,15 @@ private:
     AudioParameterFloat* gain;
     juce::AudioProcessorValueTreeState mParameters; 
     std::unique_ptr<nam::DSP> mModel;
-    std::unique_ptr<dsp::tone_stack::AbstractToneStack> mToneStack;
+    dsp::tone_stack::AbstractToneStack* mToneStack;
 
-    double** mDoubleBuffer = nullptr; 
-    double** mTempDoubleBuffer = nullptr; 
+    float** mFloatBuffer = nullptr; 
+    float** mTempFloatBuffer = nullptr; 
+
+    double** mDoubleBuffer = nullptr;
+    double** mTempDoubleBuffer = nullptr;
+
+    ParamListener mParamListener;
 
     double mBlockSize;
     double mSampleRate;

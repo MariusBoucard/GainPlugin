@@ -19,94 +19,140 @@ AmpAudioProcessor::AmpAudioProcessor()
     , mParameters(*this, nullptr, "PARAMETERS", createParameterLayout()) // Initialize parameters
     , mBlockSize(256)
     , mSampleRate(44100)
-    , mToneStack(std::make_unique<dsp::tone_stack::BasicNamToneStack>())
+    , mToneStack(new dsp::tone_stack::BasicNamToneStack())
+    , mParamListener(mToneStack)
 {
     setRateAndBufferSizeDetails(mSampleRate, mBlockSize);
     // Pre-allocate double** buffer if not already allocated
-    if (!mDoubleBuffer)
+    if (!mFloatBuffer)
     {
-        mDoubleBuffer = new double* [getNumInputChannels()];
+        mFloatBuffer = new float* [getNumInputChannels()];
         for (int channel = 0; channel < getNumInputChannels(); ++channel)
         {
-            mDoubleBuffer[channel] = new double[mBlockSize];
+            mFloatBuffer[channel] = new float[1024];
         }
     }
-    if (!mTempDoubleBuffer)
+    if (!mTempFloatBuffer)
     {
-        mTempDoubleBuffer = new double* [getNumInputChannels()];
+        mTempFloatBuffer = new float* [getNumInputChannels()];
         for (int channel = 0; channel < getNumInputChannels(); ++channel)
         {
-            mTempDoubleBuffer[channel] = new double[mBlockSize];
+            mTempFloatBuffer[channel] = new float[1024];
         }
     }
+    mParameters.addParameterListener("bass", &mParamListener);
+    mParameters.addParameterListener("mid", &mParamListener);
+    mParameters.addParameterListener("high", &mParamListener);
+
     mToneStack->Reset(getSampleRate(), getBlockSize());
     mModel = nam::get_dsp(std::filesystem::path("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\Library\\NeuralAmpModelerCore\\example_models\\Metal lead.nam"));//loadModel("kk");
     this->createEditor();
     mModel->ResetAndPrewarm(mSampleRate, mBlockSize); // Set the sample rate and block size
 }
+AmpAudioProcessor::~AmpAudioProcessor()
+{
+	// Clean up double** buffer
+    for (int channel = 0; channel < getNumInputChannels(); ++channel)
+    {
+		delete[] mFloatBuffer[channel];
+		delete[] mTempFloatBuffer[channel];
+	}
+	delete[] mFloatBuffer;
+	delete[] mTempFloatBuffer;
+}
 
 void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
 {
-    buffer.applyGain(mParameters.getParameterAsValue("input").getValue()); // Apply input gain
-
+   buffer.applyGain(mParameters.getParameterAsValue("input").getValue()); // Apply input gain
+   
     int isMono = 1;
 
     const int numChannels = buffer.getNumChannels();
     const int numSamples = buffer.getNumSamples();
 
 
+    if (!mFloatBuffer)
+    {
+		mFloatBuffer = new float* [isMono];
+		mTempFloatBuffer = new float* [isMono];
+        for (int channel = 0; channel < isMono; ++channel)
+        {
+			mFloatBuffer[channel] = new float[1024];
+			mTempFloatBuffer[channel] = new float[1024];
+		}
+	}
 
-    //// Copy float data from buffer to double**
+    if (!mDoubleBuffer)
+    {
+        mDoubleBuffer = new double* [isMono];
+        mTempDoubleBuffer = new double* [isMono];
+        for (int channel = 0; channel < isMono; ++channel)
+        {
+			mDoubleBuffer[channel] = new double[1024];
+            mTempDoubleBuffer[channel] = new double[1024];
+		}
+    }
+   // Copy float data from buffer to double**
     for (int channel = 0; channel < isMono; ++channel)
     {
         auto* floatData = buffer.getReadPointer(channel);
-        std::copy(floatData, floatData + numSamples, mDoubleBuffer[channel]);
+        std::copy(floatData, floatData + numSamples, mFloatBuffer[channel]);
     }
 
-    //// Process the model in chunks
+
+    for (int channel = 0; channel < isMono; ++channel)
+    {
+        std::transform(mFloatBuffer[channel], mFloatBuffer[channel] + numSamples, mDoubleBuffer[channel], [](float sample) {
+            return static_cast<double>(sample);
+            });
+    }
+
     const int maxBlockSize = mBlockSize;
     for (int startSample = 0; startSample < numSamples; startSample += maxBlockSize)
     {
         const int blockSize = std::min(maxBlockSize, numSamples - startSample);
 
-     
+    
     for (int channel = 0; channel < isMono; ++channel)
         {
-         //   mModel->process(mDoubleBuffer[channel] + startSample, mTempDoubleBuffer[channel] + startSample, blockSize);
+    
+          mModel->process(mDoubleBuffer[channel] + startSample, mTempDoubleBuffer[channel] + startSample, blockSize);
         }
     }
     
-    //// Copy processed data back to the buffer
 
 
+   // //// Set tone stack parameters
 
-    //// Set tone stack parameters
-   /* mToneStack->SetParam("bass", mParameters.getParameterAsValue("bass").getValue());
-    mToneStack->SetParam("middle", mParameters.getParameterAsValue("mid").getValue());
-    mToneStack->SetParam("high", mParameters.getParameterAsValue("high").getValue());*/
-
-    //// Process the tone stack
-    mTempDoubleBuffer = mToneStack->Process(mDoubleBuffer, isMono, numSamples);
-
-    ////// Copy processed data back to the buffer
-    //for (int channel = 0; channel < numChannels; ++channel)
-    //{
-    //    auto* floatData = buffer.getWritePointer(channel);
-    //    std::copy(mDoubleBuffer[channel], mDoubleBuffer[channel] + numSamples, floatData);
-    //}
+   // //// Process the tone stack
+    mDoubleBuffer = mToneStack->Process(mTempDoubleBuffer, isMono, numSamples);
 
     for (int channel = 0; channel < isMono; ++channel)
     {
+        std::transform(mDoubleBuffer[channel], mDoubleBuffer[channel] + numSamples, mTempFloatBuffer[channel], [](double sample) {
+			return static_cast<float>(sample);
+		});
+	}
+   // ////// Copy processed data back to the buffer
+   // 
+    for (int channel = 0; channel < isMono; ++channel)
+    {
         auto* floatData = buffer.getWritePointer(channel);
-        std::copy(mTempDoubleBuffer[channel], mTempDoubleBuffer[channel] + numSamples, floatData);
+        std::copy(mTempFloatBuffer[channel], mTempFloatBuffer[channel] + numSamples, floatData);
     }
 
-    //// Handle mono-to-stereo processing
-    //bool mMonoToStereo = true;
-    //if (mMonoToStereo && numChannels > 1)
-    //{
-    //    auto* floatData = buffer.getWritePointer(1);
-    //    auto* monoData = buffer.getWritePointer(0);
-    //    std::copy(monoData, monoData + numSamples, floatData);
-    //}
+   // for (int channel = 0; channel < isMono; ++channel)
+   // {
+   //     auto* floatData = buffer.getWritePointer(channel);
+   //     std::copy(mTempFloatBuffer[channel], mTempFloatBuffer[channel] + numSamples, floatData);
+   // }
+
+   // //// Handle mono-to-stereo processing
+    bool mMonoToStereo = true;
+    if (mMonoToStereo && numChannels > 1)
+    {
+        auto* floatData = buffer.getWritePointer(1);
+        auto* monoData = buffer.getReadPointer(0);
+        std::copy(monoData, monoData + numSamples, floatData);
+    }
 }
