@@ -20,8 +20,13 @@ AmpAudioProcessor::AmpAudioProcessor()
     , mBlockSize(256)
     , mSampleRate(44100)
     , mToneStack(new dsp::tone_stack::BasicNamToneStack())
-    , mParamListener(mToneStack)
+    , mNoiseGateTrigger(new dsp::noise_gate::Trigger())
+	, mNoiseGateGain(new dsp::noise_gate::Gain())
+    , mParamListener(mToneStack, mNoiseGateGain, mNoiseGateTrigger)
+
 {
+    mNoiseGateTrigger->AddListener(mNoiseGateGain);
+
     setRateAndBufferSizeDetails(mSampleRate, mBlockSize);
     // Pre-allocate double** buffer if not already allocated
     if (!mFloatBuffer)
@@ -43,7 +48,9 @@ AmpAudioProcessor::AmpAudioProcessor()
     mParameters.addParameterListener("bass", &mParamListener);
     mParameters.addParameterListener("mid", &mParamListener);
     mParameters.addParameterListener("high", &mParamListener);
-
+    mParameters.addParameterListener("gate", &mParamListener);
+    
+   // mNoiseGateGain.SetGainReductionDB(0.0f); // Set initial gain reduction to 0 dB
     mToneStack->Reset(getSampleRate(), getBlockSize());
     mModel = nam::get_dsp(std::filesystem::path("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\Library\\NeuralAmpModelerCore\\example_models\\Metal lead.nam"));//loadModel("kk");
     this->createEditor();
@@ -126,6 +133,12 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
             });
     }
 
+    //sample** triggerOutput = mInputPointers;
+    mTempDoubleBuffer = mNoiseGateTrigger->Process(mDoubleBuffer, isMono, numSamples);
+    
+
+
+
     const int maxBlockSize = mBlockSize;
     for (int startSample = 0; startSample < numSamples; startSample += maxBlockSize)
     {
@@ -135,11 +148,11 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
     for (int channel = 0; channel < isMono; ++channel)
         {
     
-          mModel->process(mDoubleBuffer[channel] + startSample, mTempDoubleBuffer[channel] + startSample, blockSize);
+          mModel->process(mTempDoubleBuffer[channel] + startSample, mDoubleBuffer[channel] + startSample, blockSize);
         }
     }
     
-
+    mTempDoubleBuffer = mNoiseGateGain->Process(mDoubleBuffer, isMono, numSamples);
 
 
     mDoubleBuffer = mToneStack->Process(mTempDoubleBuffer, isMono, numSamples);

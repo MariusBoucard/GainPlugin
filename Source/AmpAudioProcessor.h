@@ -32,6 +32,8 @@
 #include "gui.h"
 #include "NAM/dsp.h"
 #include "dsp/ToneStack.h"
+#include "dsp/NoiseGate.h"
+
 #include "NAM/get_dsp.h"
 
 enum EParams
@@ -111,8 +113,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createPar
     class ParamListener : public juce::AudioProcessorValueTreeState::Listener
     {
     public:
-        ParamListener(dsp::tone_stack::AbstractToneStack* toneStack)
-            : mToneStack(toneStack) {}
+        ParamListener(dsp::tone_stack::AbstractToneStack* toneStack,dsp::noise_gate::Gain* inGain, dsp::noise_gate::Trigger* inNoiseGateTrigger)
+            : mToneStack(toneStack)
+            , mNoiseGateGain(inGain)
+             ,mNoiseGateTrigger(inNoiseGateTrigger){}
 
         void parameterChanged(const juce::String& parameterID, float newValue) override
         {
@@ -128,10 +132,25 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createPar
             {
                 mToneStack->SetParam("high", newValue);
             }
+            else if (parameterID == "gate")
+            {
+                const double time = 0.01;
+                const double threshold = newValue* (-160); // TODO Link param
+                const double ratio = 0.1; // Quadratic...
+                const double openTime = 0.005;
+                const double holdTime = 0.01;
+                const double closeTime = 0.05;
+                const dsp::noise_gate::TriggerParams triggerParams(time, threshold, ratio, openTime, holdTime, closeTime);
+                mNoiseGateTrigger->SetParams(triggerParams);
+                mNoiseGateTrigger->SetSampleRate(44100);
+            }
         }
 
     private:
-        dsp::tone_stack::AbstractToneStack* mToneStack; // Pointer to the tone stack
+         dsp::tone_stack::AbstractToneStack* mToneStack; // Pointer to the tone stack
+         dsp::noise_gate::Gain* mNoiseGateGain; // Pointer to the noise gate gain
+         dsp::noise_gate::Trigger* mNoiseGateTrigger; // Pointer to the noise gate trigger
+	
     };
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override
@@ -171,6 +190,8 @@ private:
     juce::AudioProcessorValueTreeState mParameters; 
     std::unique_ptr<nam::DSP> mModel;
     dsp::tone_stack::AbstractToneStack* mToneStack;
+    dsp::noise_gate::Gain* mNoiseGateGain;
+    dsp::noise_gate::Trigger* mNoiseGateTrigger;
 
     float** mFloatBuffer = nullptr; 
     float** mTempFloatBuffer = nullptr; 
