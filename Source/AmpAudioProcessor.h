@@ -84,6 +84,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createPar
     params.push_back(std::make_unique<juce::AudioParameterFloat>("output", "Output", 0.0f, 1.0f, 0.5f));
     params.push_back(std::make_unique<juce::AudioParameterBool>("irEnabled", "IREnabled", false));
     params.push_back(std::make_unique<juce::AudioParameterBool>("namEnabled", "NAMEnabled", true));
+    params.push_back(std::make_unique<juce::AudioParameterBool>("irVerbEnabled", "IRVerbEnabled", false));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("irVerbMix", "irVerbMix", 0.0f, 1.0f, 0.5f));
 
     return { params.begin(), params.end() };
 }
@@ -113,8 +115,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createPar
     void changeProgramName (int, const String&) override   {}
 
     void loadImpulseResponse(const juce::File& path);
+    void loadImpulseResponseVerb(const juce::File& path);
     void loadNAMFile(const juce::File& path);
     dsp::wav::LoadReturnCode stageIR(const juce::File& path);
+    dsp::wav::LoadReturnCode stageIRVerb(const juce::File& path);
 	
     class ParamListener : public juce::AudioProcessorValueTreeState::Listener
     {
@@ -198,17 +202,25 @@ private:
     dsp::tone_stack::AbstractToneStack* mToneStack;
     dsp::noise_gate::Gain* mNoiseGateGain;
     dsp::noise_gate::Trigger* mNoiseGateTrigger;
+
     std::unique_ptr<dsp::ImpulseResponse> mIR;
     std::unique_ptr<dsp::ImpulseResponse> mStagedIR;
+    std::unique_ptr<dsp::ImpulseResponse> mIRVerb;
+    std::unique_ptr<dsp::ImpulseResponse> mStagedIRVerb;
+
     juce::File mIRPath;
+    juce::File mIRVerbPath;
+
     bool mIsIRActive;
     bool mIsNAMEnabled;
+    bool mIsIRVerbEnabled;
 
     float** mFloatBuffer = nullptr; 
     float** mTempFloatBuffer = nullptr; 
 
     double** mDoubleBuffer = nullptr;
     double** mTempDoubleBuffer = nullptr;
+    double** mVerbDoubleBuffer = nullptr;
 
     ParamListener mParamListener;
 

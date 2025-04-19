@@ -39,11 +39,12 @@ AmpAudioProcessor::AmpAudioProcessor()
     , mIsNAMEnabled(true)
     , mIsIRActive(false)
     , mIRPath(createJucePathFromFile("D:\\Projets musique\\vst\\Amps\\Revv V30 Fredman Impulse Response\\Wav\\Revv.wav"))
+    , mIRVerbPath(createJucePathFromFile("D:\\Projets musique\\vst\\Amps\\Revv V30 Fredman Impulse Response\\Wav\\Revv.wav"))
 {
     mNoiseGateTrigger->AddListener(mNoiseGateGain);
 
     setRateAndBufferSizeDetails(mSampleRate, mBlockSize);
-    // Pre-allocate double** buffer if not already allocated
+
     if (!mFloatBuffer)
     {
         mFloatBuffer = new float* [getNumInputChannels()];
@@ -60,17 +61,18 @@ AmpAudioProcessor::AmpAudioProcessor()
             mTempFloatBuffer[channel] = new float[1024];
         }
     }
+
     mParameters.addParameterListener("bass", &mParamListener);
     mParameters.addParameterListener("mid", &mParamListener);
     mParameters.addParameterListener("high", &mParamListener);
     mParameters.addParameterListener("gate", &mParamListener);
     
     mToneStack->Reset(getSampleRate(), getBlockSize());
-
     mModel = nam::get_dsp(std::filesystem::path("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\Library\\NeuralAmpModelerCore\\example_models\\Metal lead.nam"));
     mModel->ResetAndPrewarm(mSampleRate, mBlockSize);
 
     loadImpulseResponse(mIRPath);
+    loadImpulseResponseVerb(mIRVerbPath);
 
     this->createEditor();
 }
@@ -128,10 +130,12 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
     {
         mDoubleBuffer = new double* [isMono];
         mTempDoubleBuffer = new double* [isMono];
+        mVerbDoubleBuffer = new double* [isMono];
         for (int channel = 0; channel < isMono; ++channel)
         {
 			mDoubleBuffer[channel] = new double[1024];
             mTempDoubleBuffer[channel] = new double[1024];
+            mVerbDoubleBuffer[channel] = new double[1024];
 		}
     }
     for (int channel = 0; channel < isMono; ++channel)
@@ -188,10 +192,37 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
 			}
     }
 
+    if (mIRVerb != nullptr and mParameters.getParameterAsValue("irVerbEnabled").getValue())
+    {
+        for(int channel = 0; channel < isMono; ++channel)
+		{
+			std::copy(mTempDoubleBuffer[channel], mTempDoubleBuffer[channel] + numSamples, mVerbDoubleBuffer[channel]);
+		}
+        
+        mDoubleBuffer = mIRVerb->Process(mTempDoubleBuffer, isMono, numSamples);
+        float mix = mParameters.getParameterAsValue("irVerbMix").getValue();
+
+        for (int channel = 0; channel < isMono; ++channel)
+        {
+            for (int sample = 0; sample < numSamples; ++sample)
+            {
+                mDoubleBuffer[channel][sample] = (1.0f - mix) * mVerbDoubleBuffer[channel][sample] +
+                    mix * mDoubleBuffer[channel][sample];
+            }
+        }
+
+    }
+   else
+   {
+       for (int channel = 0; channel < isMono; ++channel)
+       {
+           std::copy(mTempDoubleBuffer[channel], mTempDoubleBuffer[channel] + numSamples, mDoubleBuffer[channel]);
+       }
+   }
 
     for (int channel = 0; channel < isMono; ++channel)
     {
-        std::transform(mTempDoubleBuffer[channel], mTempDoubleBuffer[channel] + numSamples, mTempFloatBuffer[channel], [](double sample) {
+        std::transform(mDoubleBuffer[channel], mDoubleBuffer[channel] + numSamples, mTempFloatBuffer[channel], [](double sample) {
 			return static_cast<float>(sample);
 		});
 	}
@@ -248,6 +279,19 @@ void AmpAudioProcessor::loadImpulseResponse(const juce::File& inIRFile)
 		std::cerr << "Failed to load impulse response." << std::endl;
 	}
 }
+void AmpAudioProcessor::loadImpulseResponseVerb(const juce::File& inIRFile)
+{
+    stageIRVerb(inIRFile);
+    if (mStagedIRVerb != nullptr)
+    {
+        mIRVerb = std::move(mStagedIRVerb);
+        mStagedIRVerb = nullptr;
+    }
+    else
+    {
+        std::cerr << "Failed to load impulse response." << std::endl;
+    }
+}
 
 void AmpAudioProcessor::loadNAMFile(const juce::File& inNAMFile)
 {
@@ -296,6 +340,43 @@ dsp::wav::LoadReturnCode AmpAudioProcessor::stageIR(const juce::File& irPath)
             mStagedIR = nullptr;
         }
         mIRPath = previousIRPath;
+    }
+
+    return wavState;
+}
+
+dsp::wav::LoadReturnCode AmpAudioProcessor::stageIRVerb(const juce::File& irPath)
+{
+    juce::File previousIRPath = mIRVerbPath;
+    const double sampleRate = getSampleRate();
+    dsp::wav::LoadReturnCode wavState = dsp::wav::LoadReturnCode::ERROR_OTHER;
+    try
+    {
+        juce::String irPathString = irPath.getFullPathName();;
+        const char* irPathChar = irPathString.toRawUTF8();    // Convert to const char*
+
+        mStagedIRVerb = std::make_unique<dsp::ImpulseResponse>(irPathChar, sampleRate);
+        wavState = mStagedIRVerb->GetWavState();
+    }
+    catch (std::runtime_error& e)
+    {
+        wavState = dsp::wav::LoadReturnCode::ERROR_OTHER;
+        std::cerr << "Caught unhandled exception while attempting to load IR:" << std::endl;
+        std::cerr << e.what() << std::endl;
+    }
+
+    if (wavState == dsp::wav::LoadReturnCode::SUCCESS)
+    {
+        mIRVerbPath = irPath;
+
+    }
+    else
+    {
+        if (mStagedIRVerb != nullptr)
+        {
+            mStagedIRVerb = nullptr;
+        }
+        mIRVerbPath = previousIRPath;
     }
 
     return wavState;

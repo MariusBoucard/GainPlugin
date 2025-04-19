@@ -129,6 +129,23 @@ public:
         mNAMChooserButtonLayout.inLayout.textboxHeight = 0;
         mNAMChooserButtonLayout.inLayout.textboxPadding = 0;
 
+        mIRVerbButtonLayout.inLayout.x = 800;
+        mIRVerbButtonLayout.inLayout.y = 300;
+		mIRVerbButtonLayout.inLayout.frameWidth = 200;
+        mIRVerbButtonLayout.inLayout.frameHeight = 50;
+		mIRVerbButtonLayout.inLayout.ratio = 1.f;
+        mIRVerbButtonLayout.inLayout.textboxHeight = 0;
+		mIRVerbButtonLayout.inLayout.textboxPadding = 0;
+
+        mVerbMixKnobLayout.inLayout.x = 800;
+		mVerbMixKnobLayout.inLayout.y = 235;
+        mVerbMixKnobLayout.inLayout.frameWidth = 135;
+		mVerbMixKnobLayout.inLayout.frameHeight = 153;
+        mVerbMixKnobLayout.inLayout.ratio = 0.5f;
+		mVerbMixKnobLayout.inLayout.textboxHeight = 20;
+        mVerbMixKnobLayout.inLayout.textboxPadding = 10;
+
+
         computeKnobLayout(mInputMeterLayout);
         computeKnobLayout(mInputKnobLayout);
         computeKnobLayout(mGateKnobLayout);
@@ -141,6 +158,8 @@ public:
         computeKnobLayout(mFileChooserButtonLayout);
         computeKnobLayout(mNAMChooserButtonLayout);
         computeKnobLayout(mNAMButtonLayout);
+        computeKnobLayout(mIRVerbButtonLayout);
+        computeKnobLayout(mVerbMixKnobLayout);
     }
 
     void computeKnobLayout(KnobLayout& inKnobLayout)
@@ -191,7 +210,6 @@ private:
     MeterComponent mOutputMeter;
 	KnobLayout mOutputMeterLayout;
 
-
     juce::Slider mInputKnob;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mInputAttachment;
     KnobLayout mInputKnobLayout;
@@ -216,9 +234,17 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mOutputKnobAttachment;
     KnobLayout mOutputKnobLayout;
 
+    juce::Slider mVerbMixKnob;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mVerbMixKnobAttachment;
+    KnobLayout mVerbMixKnobLayout;
+
     juce::ToggleButton mIRButton;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> mIRButtonAttachment;
     KnobLayout mIRButtonLayout;
+
+    juce::ToggleButton mIRVerbButton;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> mIRVerbButtonAttachment;
+    KnobLayout mIRVerbButtonLayout;
 
     juce::ToggleButton mNAMButton;
 	std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> mNAMButtonAttachment;

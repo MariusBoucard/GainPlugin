@@ -49,8 +49,11 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
     mHighKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mOutputKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mGateKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+    mVerbMixKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+
     mIRButton.setButtonText("IR");
     mNAMButton.setButtonText("NAM");
+    mIRVerbButton.setButtonText("IR Verb");
    
 
     mInputKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mInputKnobLayout.inLayout.textboxHeight);
@@ -59,6 +62,7 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
     mMidKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mMidKnobLayout.inLayout.textboxHeight);
     mHighKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mHighKnobLayout.inLayout.textboxHeight);
     mOutputKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mOutputKnobLayout.inLayout.textboxHeight);
+    mVerbMixKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mVerbMixKnobLayout.inLayout.textboxHeight);
 
     mInputAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
         ampAudioProcessor->getCustomParameterTree(), "input", mInputKnob);
@@ -76,8 +80,11 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
 		ampAudioProcessor->getCustomParameterTree(), "irEnabled", mIRButton);
     mNAMButtonAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
             ampAudioProcessor->getCustomParameterTree(), "namEnabled", mNAMButton);
-
-
+    mIRVerbButtonAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+             ampAudioProcessor->getCustomParameterTree(), "irVerbEnabled", mIRVerbButton);
+    mVerbMixKnobAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+		ampAudioProcessor->getCustomParameterTree(), "irVerbMix", mVerbMixKnob);
+	
     mInputKnob.setBounds(mInputKnobLayout.outLayout.x,
                          mInputKnobLayout.outLayout.y,
                          mInputKnobLayout.outLayout.sliderWidth,
@@ -128,7 +135,14 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
 							mNAMButtonLayout.outLayout.y,
 							mNAMButtonLayout.outLayout.sliderWidth,
 							mNAMButtonLayout.outLayout.sliderHeight);
-
+    mIRVerbButton.setBounds(mIRVerbButtonLayout.outLayout.x,
+							mIRVerbButtonLayout.outLayout.y,
+							mIRVerbButtonLayout.outLayout.sliderWidth,
+							mIRVerbButtonLayout.outLayout.sliderHeight);
+    mVerbMixKnob.setBounds(mVerbMixKnobLayout.outLayout.x,
+							mVerbMixKnobLayout.outLayout.y,
+							mVerbMixKnobLayout.outLayout.sliderWidth,
+							mVerbMixKnobLayout.outLayout.sliderHeight);
 
 
     addAndMakeVisible(mInputMeter);
@@ -142,7 +156,9 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
     addAndMakeVisible(mIRButton);
     addAndMakeVisible(mFileChooserButton);
     addAndMakeVisible(mNAMChooserButton);
-addAndMakeVisible(mNAMButton);
+    addAndMakeVisible(mNAMButton);
+    addAndMakeVisible(mIRVerbButton);
+    addAndMakeVisible(mVerbMixKnob);
    
 
     mInputKnob.setLookAndFeel(&mKnobLookAndFeel);
@@ -151,6 +167,7 @@ addAndMakeVisible(mNAMButton);
     mMidKnob.setLookAndFeel(&mKnobLookAndFeel);
     mHighKnob.setLookAndFeel(&mKnobLookAndFeel);
     mOutputKnob.setLookAndFeel(&mKnobLookAndFeel);
+    mVerbMixKnob.setLookAndFeel(&mKnobLookAndFeel);
 
     mInputKnob.setValue(0.5);
     mGateKnob.setValue(0.5);
@@ -158,6 +175,7 @@ addAndMakeVisible(mNAMButton);
     mMidKnob.setValue(0.5);
     mHighKnob.setValue(0.5);
     mOutputKnob.setValue(0.5);
+    mVerbMixKnob.setValue(0.5);
 }
 
 void RootViewComponent::handleSelectedFile(const juce::File& file)
@@ -165,7 +183,7 @@ void RootViewComponent::handleSelectedFile(const juce::File& file)
     DBG("Handling file: " << file.getFullPathName());
     AmpAudioProcessor& audioProcessor = static_cast<AmpAudioProcessor&>(processor);
     audioProcessor.loadImpulseResponse(file);
-    std::string filePath = file.getFullPathName().toStdString();
+    std::string filePath = file.getFullPathName().toStdString().substr(file.getFullPathName().length() - 20, file.getFullPathName().length());
     mFileChooserButton.setButtonText("Load IR : "+ filePath);
 
 }
@@ -197,8 +215,8 @@ void RootViewComponent::handleSelectedNAMFile(const juce::File& file)
 	DBG("Handling NAM file: " << file.getFullPathName());
 	AmpAudioProcessor& audioProcessor = static_cast<AmpAudioProcessor&>(processor);
 	audioProcessor.loadNAMFile(file);
-	std::string filePath = file.getFullPathName().toStdString();
-	mNAMChooserButton.setButtonText("Load NAM : "+ filePath);
+    std::string filePath = file.getFullPathName().toStdString().substr(file.getFullPathName().length() - 20, file.getFullPathName().length());
+    mNAMChooserButton.setButtonText("Load NAM : "+ filePath);
 }
 void RootViewComponent::paint(juce::Graphics& g)
 {
