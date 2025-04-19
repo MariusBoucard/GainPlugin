@@ -39,6 +39,36 @@ public:
                     sourceRect.getWidth(), sourceRect.getHeight());
     }
 
+
+    void drawLabel(juce::Graphics& g, juce::Label& label) override
+    {
+        if (auto* slider = dynamic_cast<juce::Slider*>(label.getParentComponent()))
+        {
+            if (!slider->isMouseOverOrDragging())
+            {
+                // If not hovered, don't draw the label
+                return;
+            }
+        }
+        juce::Rectangle bounds = label.getLocalBounds();
+        bounds.setX(15);
+        bounds.setWidth(bounds.getWidth() -15);
+
+        // Draw the background
+        g.setColour(juce::Colours::darkgrey);
+        g.fillRect(bounds);
+        // Draw the border
+        g.setColour(juce::Colours::limegreen);
+        g.drawRect(bounds, 2.0f); // Border thickness of 2.0f
+
+
+      
+
+        // Draw the text
+        g.setColour(juce::Colours::white);
+        g.setFont(label.getFont());
+        g.drawText(label.getText(), bounds, juce::Justification::centred, true);
+    }
 private:
     juce::Image mKnobStrip;
 };

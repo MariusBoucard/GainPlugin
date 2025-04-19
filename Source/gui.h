@@ -39,7 +39,7 @@ public:
 		mInputKnobLayout.inLayout.frameHeight = 153;
 		mInputKnobLayout.inLayout.ratio = 0.5f;
 		mInputKnobLayout.inLayout.textboxHeight = 20;
-        mInputKnobLayout.inLayout.textboxPadding = 10;
+        mInputKnobLayout.inLayout.textboxPadding = -15;
 
         mGateKnobLayout.inLayout.x = 260;
 		mGateKnobLayout.inLayout.y = 235;
@@ -47,7 +47,7 @@ public:
 		mGateKnobLayout.inLayout.frameHeight = 153;
         mGateKnobLayout.inLayout.ratio = 0.5f;
 		mGateKnobLayout.inLayout.textboxHeight = 20;
-        mGateKnobLayout.inLayout.textboxPadding = 10;
+        mGateKnobLayout.inLayout.textboxPadding = -15;
 
         mBassKnobLayout.inLayout.x = 390;
         mBassKnobLayout.inLayout.y = 235;
@@ -55,7 +55,7 @@ public:
         mBassKnobLayout.inLayout.frameHeight = 153;
         mBassKnobLayout.inLayout.ratio = 0.5f;
         mBassKnobLayout.inLayout.textboxHeight = 20;
-        mBassKnobLayout.inLayout.textboxPadding = 10;
+        mBassKnobLayout.inLayout.textboxPadding = -15;
 
         mMidKnobLayout.inLayout.x = 460;
         mMidKnobLayout.inLayout.y = 235;
@@ -63,7 +63,7 @@ public:
         mMidKnobLayout.inLayout.frameHeight = 153;
         mMidKnobLayout.inLayout.ratio = 0.5f;
         mMidKnobLayout.inLayout.textboxHeight = 20;
-        mMidKnobLayout.inLayout.textboxPadding = 10;
+        mMidKnobLayout.inLayout.textboxPadding = -15;
 
         mHighKnobLayout.inLayout.x = 527;
         mHighKnobLayout.inLayout.y = 235;
@@ -71,7 +71,7 @@ public:
         mHighKnobLayout.inLayout.frameHeight = 153;
         mHighKnobLayout.inLayout.ratio = 0.5f;
         mHighKnobLayout.inLayout.textboxHeight = 20;
-        mHighKnobLayout.inLayout.textboxPadding = 10;
+        mHighKnobLayout.inLayout.textboxPadding = -15;
 
         mOutputKnobLayout.inLayout.x = 645;
         mOutputKnobLayout.inLayout.y = 235;
@@ -79,7 +79,7 @@ public:
         mOutputKnobLayout.inLayout.frameHeight = 153;
         mOutputKnobLayout.inLayout.ratio = 0.5f;
         mOutputKnobLayout.inLayout.textboxHeight = 20;
-        mOutputKnobLayout.inLayout.textboxPadding = 10;
+        mOutputKnobLayout.inLayout.textboxPadding = -15;
 
         mInputMeterLayout.inLayout.x = 100;
         mInputMeterLayout.inLayout.y = 225;
@@ -143,7 +143,7 @@ public:
 		mVerbMixKnobLayout.inLayout.frameHeight = 153;
         mVerbMixKnobLayout.inLayout.ratio = 0.5f;
 		mVerbMixKnobLayout.inLayout.textboxHeight = 20;
-        mVerbMixKnobLayout.inLayout.textboxPadding = 10;
+        mVerbMixKnobLayout.inLayout.textboxPadding = -15;
 
 
         computeKnobLayout(mInputMeterLayout);
@@ -167,7 +167,7 @@ public:
 	    inKnobLayout.outLayout.x = inKnobLayout.inLayout.x;
         inKnobLayout.outLayout.y = inKnobLayout.inLayout.y;
         inKnobLayout.outLayout.sliderWidth = inKnobLayout.inLayout.frameWidth * inKnobLayout.inLayout.ratio;
-        inKnobLayout.outLayout.sliderHeight = (inKnobLayout.inLayout.frameHeight + inKnobLayout.inLayout.textboxHeight + inKnobLayout.inLayout.textboxPadding) * inKnobLayout.inLayout.ratio;
+        inKnobLayout.outLayout.sliderHeight = (inKnobLayout.inLayout.frameHeight + inKnobLayout.inLayout.textboxHeight + 10) * inKnobLayout.inLayout.ratio;
 	}
 
     void openFileChooser();

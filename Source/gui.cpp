@@ -54,16 +54,15 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
     mIRButton.setButtonText("IR");
     mNAMButton.setButtonText("NAM");
     mIRVerbButton.setButtonText("IR Verb");
-   
 
-    mInputKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mInputKnobLayout.inLayout.textboxHeight);
-    mGateKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mGateKnobLayout.inLayout.textboxHeight);
-    mBassKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mBassKnobLayout.inLayout.textboxHeight);
-    mMidKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mMidKnobLayout.inLayout.textboxHeight);
-    mHighKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mHighKnobLayout.inLayout.textboxHeight);
-    mOutputKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mOutputKnobLayout.inLayout.textboxHeight);
-    mVerbMixKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mVerbMixKnobLayout.inLayout.textboxHeight);
-
+    mInputKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, mInputKnobLayout.inLayout.textboxHeight);
+    mGateKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, mGateKnobLayout.inLayout.textboxHeight);
+    mBassKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, mBassKnobLayout.inLayout.textboxHeight);
+    mMidKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, mMidKnobLayout.inLayout.textboxHeight);
+    mHighKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, mHighKnobLayout.inLayout.textboxHeight);
+    mOutputKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, mOutputKnobLayout.inLayout.textboxHeight);
+    mVerbMixKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, mVerbMixKnobLayout.inLayout.textboxHeight);
+    
     mInputAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
         ampAudioProcessor->getCustomParameterTree(), "input", mInputKnob);
     mBassKnobAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
