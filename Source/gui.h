@@ -63,11 +63,20 @@ public:
                 mHighKnobLayout.inLayout.textboxHeight = 20;
                 mHighKnobLayout.inLayout.textboxPadding = 10;
 
+                mOutputKnobLayout.inLayout.x = 650;
+                mOutputKnobLayout.inLayout.y = 235;
+                mOutputKnobLayout.inLayout.frameWidth = 135;
+                mOutputKnobLayout.inLayout.frameHeight = 153;
+                mOutputKnobLayout.inLayout.ratio = 0.5f;
+                mOutputKnobLayout.inLayout.textboxHeight = 20;
+                mOutputKnobLayout.inLayout.textboxPadding = 10;
+
+
                 computeKnobLayout(mInputKnobLayout);
                 computeKnobLayout(mBassKnobLayout);
                 computeKnobLayout(mMidKnobLayout);
                 computeKnobLayout(mHighKnobLayout);
-
+                computeKnobLayout(mOutputKnobLayout);
     }
 
     void computeKnobLayout(KnobLayout& inKnobLayout)
@@ -103,7 +112,7 @@ private:
     KnobLayout mHighKnobLayout;
 
     juce::Slider mOutputKnob;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mOuptutKnobAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mOutputKnobAttachment;
     KnobLayout mOutputKnobLayout;
 
     KnobLookAndFeel mKnobLookAndFeel; // Custom LookAndFeel for the knob

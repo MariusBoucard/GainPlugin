@@ -18,7 +18,6 @@ RootViewComponent::RootViewComponent(juce::AudioProcessor& processor)
     if (mImage.isNull())
         DBG("Failed to load image from resources");
 
-    // Set the size of the editor
     setSize(ROOT_WIDTH,ROOT_HEIGHT);
 
     defineKnobLayout();
@@ -35,11 +34,14 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
     mBassKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mMidKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mHighKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+    mOutputKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+   
 
     mInputKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mInputKnobLayout.inLayout.textboxHeight);
     mBassKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mBassKnobLayout.inLayout.textboxHeight);
     mMidKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mMidKnobLayout.inLayout.textboxHeight);
     mHighKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mHighKnobLayout.inLayout.textboxHeight);
+    mOutputKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mOutputKnobLayout.inLayout.textboxHeight);
 
     mInputAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
         ampAudioProcessor->getCustomParameterTree(), "input", mInputKnob);
@@ -49,6 +51,8 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
         ampAudioProcessor->getCustomParameterTree(), "mid", mMidKnob);
     mHighKnobAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
         ampAudioProcessor->getCustomParameterTree(), "high", mHighKnob);
+    mOutputKnobAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+        ampAudioProcessor->getCustomParameterTree(), "output", mOutputKnob);
 
     mInputKnob.setBounds(mInputKnobLayout.outLayout.x,
                          mInputKnobLayout.outLayout.y,
@@ -66,21 +70,29 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
                         mHighKnobLayout.outLayout.y,
                         mHighKnobLayout.outLayout.sliderWidth,
                         mHighKnobLayout.outLayout.sliderHeight);
+    mOutputKnob.setBounds(mOutputKnobLayout.outLayout.x,
+        				  mOutputKnobLayout.outLayout.y,
+        				  mOutputKnobLayout.outLayout.sliderWidth,
+        				  mOutputKnobLayout.outLayout.sliderHeight);
+
 
     addAndMakeVisible(mInputKnob);
     addAndMakeVisible(mBassKnob);
     addAndMakeVisible(mMidKnob);
     addAndMakeVisible(mHighKnob);
+    addAndMakeVisible(mOutputKnob);
 
     mInputKnob.setLookAndFeel(&mKnobLookAndFeel);
     mBassKnob.setLookAndFeel(&mKnobLookAndFeel);
     mMidKnob.setLookAndFeel(&mKnobLookAndFeel);
     mHighKnob.setLookAndFeel(&mKnobLookAndFeel);
+    mOutputKnob.setLookAndFeel(&mKnobLookAndFeel);
 
     mInputKnob.setValue(0.5);
     mBassKnob.setValue(0.5);
     mMidKnob.setValue(0.5);
     mHighKnob.setValue(0.5);
+    mOutputKnob.setValue(0.5);
 }
 
 void RootViewComponent::paint(juce::Graphics& g)

@@ -143,4 +143,6 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
         auto* monoData = buffer.getReadPointer(0);
         std::copy(monoData, monoData + numSamples, floatData);
     }
+
+    buffer.applyGain(mParameters.getParameterAsValue("output").getValue()); 
 }
