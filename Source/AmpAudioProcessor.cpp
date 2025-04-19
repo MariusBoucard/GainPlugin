@@ -13,6 +13,19 @@
 #include <filesystem>
 #include <iostream>
 
+juce::File createJucePathFromFile(const juce::String& filePath)
+{
+    juce::File file(filePath); // Create a juce::File object from the file path
+    if (!file.existsAsFile())
+    {
+        DBG("File does not exist: " << filePath);
+        return juce::File(); // Return an empty file if it doesn't exist
+    }
+
+
+    return file;
+}
+
 AmpAudioProcessor::AmpAudioProcessor()
     : AudioProcessor(BusesProperties().withInput("Input", AudioChannelSet::mono())
     . withOutput("Output", AudioChannelSet::stereo()))
@@ -23,7 +36,7 @@ AmpAudioProcessor::AmpAudioProcessor()
     , mNoiseGateTrigger(new dsp::noise_gate::Trigger())
 	, mNoiseGateGain(new dsp::noise_gate::Gain())
     , mParamListener(mToneStack, mNoiseGateGain, mNoiseGateTrigger)
-
+    , mIRPath(createJucePathFromFile("D:\\Projets musique\\vst\\Amps\\Revv V30 Fredman Impulse Response\\Wav\\Revv.wav"))
 {
     mNoiseGateTrigger->AddListener(mNoiseGateGain);
 
@@ -53,6 +66,13 @@ AmpAudioProcessor::AmpAudioProcessor()
    // mNoiseGateGain.SetGainReductionDB(0.0f); // Set initial gain reduction to 0 dB
     mToneStack->Reset(getSampleRate(), getBlockSize());
     mModel = nam::get_dsp(std::filesystem::path("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\Library\\NeuralAmpModelerCore\\example_models\\Metal lead.nam"));//loadModel("kk");
+    stageIR(mIRPath); 
+    bool activeIR = true;
+    if (mStagedIR != nullptr and activeIR)
+    {
+        mIR = std::move(mStagedIR);
+        mStagedIR = nullptr;
+    }
     this->createEditor();
     mModel->ResetAndPrewarm(mSampleRate, mBlockSize); // Set the sample rate and block size
 }
@@ -133,7 +153,6 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
             });
     }
 
-    //sample** triggerOutput = mInputPointers;
     mTempDoubleBuffer = mNoiseGateTrigger->Process(mDoubleBuffer, isMono, numSamples);
     
 
@@ -157,9 +176,20 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
 
     mDoubleBuffer = mToneStack->Process(mTempDoubleBuffer, isMono, numSamples);
 
+    if (mIR != nullptr) // TODO add param to trigger path
+        mTempDoubleBuffer = mIR->Process(mDoubleBuffer, isMono, numSamples);
+    else
+    {
+			for (int channel = 0; channel < isMono; ++channel)
+			{
+				std::copy(mDoubleBuffer[channel], mDoubleBuffer[channel] + numSamples, mTempDoubleBuffer[channel]);
+			}
+    }
+
+
     for (int channel = 0; channel < isMono; ++channel)
     {
-        std::transform(mDoubleBuffer[channel], mDoubleBuffer[channel] + numSamples, mTempFloatBuffer[channel], [](double sample) {
+        std::transform(mTempDoubleBuffer[channel], mTempDoubleBuffer[channel] + numSamples, mTempFloatBuffer[channel], [](double sample) {
 			return static_cast<float>(sample);
 		});
 	}
@@ -176,6 +206,7 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
         auto* monoData = buffer.getReadPointer(0);
         std::copy(monoData, monoData + numSamples, floatData);
     }
+
 
     buffer.applyGain(mParameters.getParameterAsValue("output").getValue()); 
 
@@ -201,4 +232,43 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
             mRmsOutputLevelRight.store(rms);
         }
     }
+}
+
+dsp::wav::LoadReturnCode AmpAudioProcessor::stageIR(const juce::File& irPath)
+{
+    // FIXME it'd be better for the path to be "staged" as well. Just in case the
+    // path and the model got caught on opposite sides of the fence...
+    juce::File previousIRPath = mIRPath;
+    const double sampleRate = getSampleRate();
+    dsp::wav::LoadReturnCode wavState = dsp::wav::LoadReturnCode::ERROR_OTHER;
+    try
+    {
+        juce::String irPathString = irPath.getFullPathName();;
+        const char* irPathChar = irPathString.toRawUTF8();    // Convert to const char*
+
+        mStagedIR = std::make_unique<dsp::ImpulseResponse>(irPathChar, sampleRate);
+        wavState = mStagedIR->GetWavState();
+    }
+    catch (std::runtime_error& e)
+    {
+        wavState = dsp::wav::LoadReturnCode::ERROR_OTHER;
+        std::cerr << "Caught unhandled exception while attempting to load IR:" << std::endl;
+        std::cerr << e.what() << std::endl;
+    }
+
+    if (wavState == dsp::wav::LoadReturnCode::SUCCESS)
+    {
+        mIRPath = irPath;
+     
+    }
+    else
+    {
+        if (mStagedIR != nullptr)
+        {
+            mStagedIR = nullptr;
+        }
+        mIRPath = previousIRPath;
+    }
+
+    return wavState;
 }

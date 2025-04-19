@@ -33,7 +33,7 @@
 #include "NAM/dsp.h"
 #include "dsp/ToneStack.h"
 #include "dsp/NoiseGate.h"
-
+#include "dsp/ImpulseResponse.h"
 #include "NAM/get_dsp.h"
 
 enum EParams
@@ -110,6 +110,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createPar
     const String getProgramName (int) override             { return "None"; }
     void changeProgramName (int, const String&) override   {}
 
+    dsp::wav::LoadReturnCode stageIR(const juce::File& path);
+	
     class ParamListener : public juce::AudioProcessorValueTreeState::Listener
     {
     public:
@@ -192,6 +194,9 @@ private:
     dsp::tone_stack::AbstractToneStack* mToneStack;
     dsp::noise_gate::Gain* mNoiseGateGain;
     dsp::noise_gate::Trigger* mNoiseGateTrigger;
+    std::unique_ptr<dsp::ImpulseResponse> mIR;
+    std::unique_ptr<dsp::ImpulseResponse> mStagedIR;
+    juce::File mIRPath;
 
     float** mFloatBuffer = nullptr; 
     float** mTempFloatBuffer = nullptr; 
