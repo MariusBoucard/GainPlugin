@@ -79,6 +79,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createPar
     params.push_back(std::make_unique<juce::AudioParameterFloat>("bass", "Bass", 0.0f, 1.0f, 0.5f));
     params.push_back(std::make_unique<juce::AudioParameterFloat>("mid", "Mid", 0.0f, 1.0f, 0.5f));
     params.push_back(std::make_unique<juce::AudioParameterFloat>("high", "High", 0.0f, 1.0f, 0.5f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("output", "Output", 0.0f, 1.0f, 0.5f));
 
     return { params.begin(), params.end() };
 }
@@ -115,7 +116,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createPar
 
     void setStateInformation (const void* data, int sizeInBytes) override
     {
-        gain->setValueNotifyingHost (MemoryInputStream (data, static_cast<size_t> (sizeInBytes), false).readFloat());
     }
 
     //==============================================================================
@@ -138,6 +138,8 @@ private:
     AudioParameterFloat* gain;
     juce::AudioProcessorValueTreeState mParameters; 
     std::unique_ptr<nam::DSP> mModel;
+    double mBlockSize;
+    double mSampleRate;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmpAudioProcessor)
 };
