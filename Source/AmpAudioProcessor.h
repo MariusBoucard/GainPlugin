@@ -72,9 +72,14 @@ public:
 
 juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createParameterLayout()
 {
-    // Define the gain parameter
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
+
     params.push_back (std::make_unique<juce::AudioParameterFloat> ("input", "Input", 0.0f, 1.0f, 0.5f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("gate", "Gate", 0.0f, 1.0f, 0.5f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("bass", "Bass", 0.0f, 1.0f, 0.5f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("mid", "Mid", 0.0f, 1.0f, 0.5f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("high", "High", 0.0f, 1.0f, 0.5f));
+
     return { params.begin(), params.end() };
 }
     //==============================================================================
@@ -116,6 +121,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createPar
     //==============================================================================
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override
     {
+        return true;
         const auto& mainInLayout  = layouts.getChannelSet (true,  0);
         const auto& mainOutLayout = layouts.getChannelSet (false, 0);
 

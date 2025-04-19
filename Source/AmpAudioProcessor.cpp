@@ -15,7 +15,7 @@
 
 AmpAudioProcessor::AmpAudioProcessor()
     : AudioProcessor(BusesProperties().withInput("Input", AudioChannelSet::mono())
-    . withOutput("Output", AudioChannelSet::mono()))
+    . withOutput("Output", AudioChannelSet::stereo()))
     , mParameters(*this, nullptr, "PARAMETERS", createParameterLayout()) // Initialize parameters
 {
     mModel = nam::get_dsp(std::filesystem::path("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\Library\\NeuralAmpModelerCore\\example_models\\Metal lead.nam"));//loadModel("kk");
@@ -25,16 +25,18 @@ AmpAudioProcessor::AmpAudioProcessor()
 }
 void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
 {
-    //buffer.applyGain(*gain);
+    // Apply gain before processing
+    buffer.applyGain(mParameters.getParameterAsValue("input").getValue()); // Use the parameter value directly
+   // buffer.applyGain(*gain);
 
-    //// Get the number of channels and samples
+    // Get the number of channels and samples
     const int numChannels = buffer.getNumChannels();
     const int numSamples = buffer.getNumSamples();
-    //
-    //// Create a temporary buffer for double-precision data
+
+    // Create a temporary buffer for double-precision data
     std::vector<std::vector<double>> doubleBuffer(numChannels, std::vector<double>(numSamples));
 
-    //// Convert the float buffer to double
+    // Convert the float buffer to double
     for (int channel = 0; channel < numChannels; ++channel)
     {
         auto* floatData = buffer.getReadPointer(channel);
@@ -42,14 +44,20 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
         std::copy(floatData, floatData + numSamples, doubleData.begin());
     }
 
-    //// Process each channel individually
-    for (int channel = 0; channel < numChannels; ++channel)
+    // Process the buffer in chunks to avoid exceeding the model's max block size
+    const int maxBlockSize = 512; // Replace with the actual max block size of mModel
+    for (int startSample = 0; startSample < numSamples; startSample += maxBlockSize)
     {
-        auto& doubleData = doubleBuffer[channel];
-        mModel->process(doubleData.data(), doubleData.data(), numSamples);
+        const int blockSize = std::min(maxBlockSize, numSamples - startSample);
+
+        for (int channel = 0; channel < numChannels; ++channel)
+        {
+            auto& doubleData = doubleBuffer[channel];
+            mModel->process(doubleData.data() + startSample, doubleData.data() + startSample, blockSize);
+        }
     }
 
-    //// Convert the processed double data back to float
+    // Convert the processed double data back to float
     for (int channel = 0; channel < numChannels; ++channel)
     {
         auto* floatData = buffer.getWritePointer(channel);
@@ -57,6 +65,16 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
         std::transform(doubleData.begin(), doubleData.end(), floatData, [](double sample) {
             return static_cast<float>(sample);
             });
+    }
+
+    bool mMonoToStereo = false;
+    if (mMonoToStereo)
+    {
+       auto* floatData = buffer.getWritePointer(1);
+       auto& doubleData = doubleBuffer[0];
+       std::transform(doubleData.begin(), doubleData.end(), floatData, [](double sample) {
+           return static_cast<float>(sample);
+           });
     }
 
  }
