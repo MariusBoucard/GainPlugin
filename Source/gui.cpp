@@ -50,6 +50,7 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
     mOutputKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mGateKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mIRButton.setButtonText("IR");
+    mNAMButton.setButtonText("NAM");
    
 
     mInputKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mInputKnobLayout.inLayout.textboxHeight);
@@ -73,7 +74,9 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
     ampAudioProcessor->getCustomParameterTree(), "gate", mGateKnob);
     mIRButtonAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
 		ampAudioProcessor->getCustomParameterTree(), "irEnabled", mIRButton);
-    
+    mNAMButtonAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+            ampAudioProcessor->getCustomParameterTree(), "namEnabled", mNAMButton);
+
 
     mInputKnob.setBounds(mInputKnobLayout.outLayout.x,
                          mInputKnobLayout.outLayout.y,
@@ -121,7 +124,10 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
                                 mNAMChooserButtonLayout.outLayout.y,
                                 mNAMChooserButtonLayout.outLayout.sliderWidth,
                                 mNAMChooserButtonLayout.outLayout.sliderHeight);
-
+    mNAMButton.setBounds(mNAMButtonLayout.outLayout.x,
+							mNAMButtonLayout.outLayout.y,
+							mNAMButtonLayout.outLayout.sliderWidth,
+							mNAMButtonLayout.outLayout.sliderHeight);
 
 
 
@@ -136,6 +142,7 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
     addAndMakeVisible(mIRButton);
     addAndMakeVisible(mFileChooserButton);
     addAndMakeVisible(mNAMChooserButton);
+addAndMakeVisible(mNAMButton);
    
 
     mInputKnob.setLookAndFeel(&mKnobLookAndFeel);
@@ -199,7 +206,6 @@ void RootViewComponent::paint(juce::Graphics& g)
 
     if (!mImage.isNull())
     {
-        // Draw the image centered in the component
         auto bounds = getLocalBounds().toFloat();
         auto imageBounds = mImage.getBounds().toFloat();
         auto scale = juce::jmin(bounds.getWidth() / imageBounds.getWidth(),
@@ -218,14 +224,10 @@ void RootViewComponent::paint(juce::Graphics& g)
 void RootViewComponent::resized()
 {
     auto bounds = getLocalBounds();
-
-    //mInputKnob.setBounds(bounds.getCentreX() - 50, bounds.getCentreY() - 50, 100, 100); // 100x100 knob
-    // Handle resizing logic if needed
 }
 
 void RootViewComponent::MeterComponent::paint(juce::Graphics& g)
 {
-    
 
         AmpAudioProcessor& meter = static_cast<AmpAudioProcessor&>(audioProcessor);
         float rmsLeft = 0.0f;
@@ -251,13 +253,6 @@ void RootViewComponent::MeterComponent::paint(juce::Graphics& g)
         juce::Rectangle<float> meterBounds(0, 0, getWidth(), getHeight());
         juce::Rectangle<float> leftMeterBounds(0, getHeight() - (rmsLeft * getHeight()), getWidth() / 2, rmsLeft * getHeight());
         g.fillRect(juce::Rectangle<float>(10, 10, 3, rmsLeft * getHeight()));
-      //  g.setColour(juce::Colours::blue);
 
-   //     g.fillRect(juce::Rectangle<float>(50, getHeight() - (rmsLeft * getHeight()), 20, rmsLeft * getHeight()));
-
-    
-
-	// Draw the meter
-	g.setColour(juce::Colours::blue);
-	//g.fillRect(getLocalBounds().toFloat().reduced(10)); // Draw a rectangle for the meter
+	    g.setColour(juce::Colours::blue);
 }

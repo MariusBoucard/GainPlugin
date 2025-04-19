@@ -36,6 +36,8 @@ AmpAudioProcessor::AmpAudioProcessor()
     , mNoiseGateTrigger(new dsp::noise_gate::Trigger())
 	, mNoiseGateGain(new dsp::noise_gate::Gain())
     , mParamListener(mToneStack, mNoiseGateGain, mNoiseGateTrigger)
+    , mIsNAMEnabled(true)
+    , mIsIRActive(false)
     , mIRPath(createJucePathFromFile("D:\\Projets musique\\vst\\Amps\\Revv V30 Fredman Impulse Response\\Wav\\Revv.wav"))
 {
     mNoiseGateTrigger->AddListener(mNoiseGateGain);
@@ -74,7 +76,6 @@ AmpAudioProcessor::AmpAudioProcessor()
 }
 AmpAudioProcessor::~AmpAudioProcessor()
 {
-	// Clean up double** buffer
     for (int channel = 0; channel < getNumInputChannels(); ++channel)
     {
 		delete[] mFloatBuffer[channel];
@@ -93,7 +94,6 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
     const int numChannels = buffer.getNumChannels();
     const int numSamples = buffer.getNumSamples();
 
-    // Calculate RMS levels
     for (int channel = 0; channel < isMono; ++channel)
     {
         auto* channelData = buffer.getReadPointer(channel);
@@ -106,7 +106,6 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
 
         float rms = std::sqrt(sum / numSamples);
 
-        // Update the atomic variables
         if (channel == 0)
         {
             mRmsLevelLeft.store(rms);
@@ -150,22 +149,29 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
     }
 
     mTempDoubleBuffer = mNoiseGateTrigger->Process(mDoubleBuffer, isMono, numSamples);
-    
 
-
-
-    const int maxBlockSize = mBlockSize;
-    for (int startSample = 0; startSample < numSamples; startSample += maxBlockSize)
+    if (mIsNAMEnabled and mParameters.getParameterAsValue("namEnabled").getValue())
     {
-        const int blockSize = std::min(maxBlockSize, numSamples - startSample);
-
-    
-    for (int channel = 0; channel < isMono; ++channel)
+        const int maxBlockSize = mBlockSize;
+        for (int startSample = 0; startSample < numSamples; startSample += maxBlockSize)
         {
-    
-          mModel->process(mTempDoubleBuffer[channel] + startSample, mDoubleBuffer[channel] + startSample, blockSize);
+            const int blockSize = std::min(maxBlockSize, numSamples - startSample);
+
+
+            for (int channel = 0; channel < isMono; ++channel)
+            {
+
+                mModel->process(mTempDoubleBuffer[channel] + startSample, mDoubleBuffer[channel] + startSample, blockSize);
+            }
         }
     }
+    else
+	{
+		for (int channel = 0; channel < isMono; ++channel)
+		{
+			std::copy(mTempDoubleBuffer[channel], mTempDoubleBuffer[channel] + numSamples, mDoubleBuffer[channel]);
+		}
+	}
     
     mTempDoubleBuffer = mNoiseGateGain->Process(mDoubleBuffer, isMono, numSamples);
 
@@ -247,8 +253,10 @@ void AmpAudioProcessor::loadNAMFile(const juce::File& inNAMFile)
 {
 	try
 	{
+        mIsNAMEnabled = false;
 		mModel = nam::get_dsp(std::filesystem::path(inNAMFile.getFullPathName().toStdString()));
 		mModel->ResetAndPrewarm(mSampleRate, mBlockSize); // Set the sample rate and block size
+        mIsNAMEnabled = true;
 	}
 	catch (const std::exception& e)
 	{

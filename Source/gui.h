@@ -97,13 +97,21 @@ public:
         mOutputMeterLayout.inLayout.textboxHeight = 20;
 		mOutputMeterLayout.inLayout.textboxPadding = 10;
 
-        mIRButtonLayout.inLayout.x = 900;
-        mIRButtonLayout.inLayout.y = 250;
+        mIRButtonLayout.inLayout.x = 850;
+        mIRButtonLayout.inLayout.y = 500;
         mIRButtonLayout.inLayout.frameWidth = 70;
         mIRButtonLayout.inLayout.frameHeight = 60;
-		mIRButtonLayout.inLayout.ratio = 0.5f;
-        mIRButtonLayout.inLayout.textboxHeight = 20;
-		mIRButtonLayout.inLayout.textboxPadding = 10;
+		mIRButtonLayout.inLayout.ratio = 1.f;
+        mIRButtonLayout.inLayout.textboxHeight = 0;
+		mIRButtonLayout.inLayout.textboxPadding = 0;
+
+        mNAMButtonLayout.inLayout.x = 850;
+        mNAMButtonLayout.inLayout.y = 50;
+        mNAMButtonLayout.inLayout.frameWidth = 70;
+        mNAMButtonLayout.inLayout.frameHeight = 60;
+        mNAMButtonLayout.inLayout.ratio = 1.f;
+        mNAMButtonLayout.inLayout.textboxHeight = 0;
+        mNAMButtonLayout.inLayout.textboxPadding = 0;
 
         mFileChooserButtonLayout.inLayout.x = 300;
         mFileChooserButtonLayout.inLayout.y = 500;
@@ -132,6 +140,7 @@ public:
         computeKnobLayout(mIRButtonLayout);
         computeKnobLayout(mFileChooserButtonLayout);
         computeKnobLayout(mNAMChooserButtonLayout);
+        computeKnobLayout(mNAMButtonLayout);
     }
 
     void computeKnobLayout(KnobLayout& inKnobLayout)
@@ -210,6 +219,10 @@ private:
     juce::ToggleButton mIRButton;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> mIRButtonAttachment;
     KnobLayout mIRButtonLayout;
+
+    juce::ToggleButton mNAMButton;
+	std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> mNAMButtonAttachment;
+    KnobLayout mNAMButtonLayout;
 
     juce::TextButton mFileChooserButton;
     KnobLayout mFileChooserButtonLayout;

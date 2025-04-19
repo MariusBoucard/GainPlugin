@@ -83,6 +83,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createPar
     params.push_back(std::make_unique<juce::AudioParameterFloat>("high", "High", 0.0f, 1.0f, 0.5f));
     params.push_back(std::make_unique<juce::AudioParameterFloat>("output", "Output", 0.0f, 1.0f, 0.5f));
     params.push_back(std::make_unique<juce::AudioParameterBool>("irEnabled", "IREnabled", false));
+    params.push_back(std::make_unique<juce::AudioParameterBool>("namEnabled", "NAMEnabled", true));
 
     return { params.begin(), params.end() };
 }
@@ -201,6 +202,7 @@ private:
     std::unique_ptr<dsp::ImpulseResponse> mStagedIR;
     juce::File mIRPath;
     bool mIsIRActive;
+    bool mIsNAMEnabled;
 
     float** mFloatBuffer = nullptr; 
     float** mTempFloatBuffer = nullptr; 
