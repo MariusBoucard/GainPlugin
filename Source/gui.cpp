@@ -20,6 +20,7 @@ RootViewComponent::RootViewComponent(juce::AudioProcessor& processor)
     if (mImage.isNull())
         DBG("Failed to load image from resources");
 
+
     setSize(ROOT_WIDTH,ROOT_HEIGHT);
 
     defineKnobLayout();
@@ -38,9 +39,11 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
     mMidKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mHighKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mOutputKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+    mGateKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
    
 
     mInputKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mInputKnobLayout.inLayout.textboxHeight);
+    mGateKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mGateKnobLayout.inLayout.textboxHeight);
     mBassKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mBassKnobLayout.inLayout.textboxHeight);
     mMidKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mMidKnobLayout.inLayout.textboxHeight);
     mHighKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mHighKnobLayout.inLayout.textboxHeight);
@@ -56,11 +59,18 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
         ampAudioProcessor->getCustomParameterTree(), "high", mHighKnob);
     mOutputKnobAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
         ampAudioProcessor->getCustomParameterTree(), "output", mOutputKnob);
+    mGateKnobAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+    ampAudioProcessor->getCustomParameterTree(), "gate", mGateKnob);
+
 
     mInputKnob.setBounds(mInputKnobLayout.outLayout.x,
                          mInputKnobLayout.outLayout.y,
                          mInputKnobLayout.outLayout.sliderWidth,
                          mInputKnobLayout.outLayout.sliderHeight);
+mGateKnob.setBounds(mGateKnobLayout.outLayout.x,
+                    mGateKnobLayout.outLayout.y,
+						mGateKnobLayout.outLayout.sliderWidth,
+						mGateKnobLayout.outLayout.sliderHeight);
     mBassKnob.setBounds(mBassKnobLayout.outLayout.x,
                         mBassKnobLayout.outLayout.y,
         		        mBassKnobLayout.outLayout.sliderWidth,
@@ -89,6 +99,7 @@ mOutputMeter.setBounds(mOutputMeterLayout.outLayout.x,
 
     addAndMakeVisible(mInputMeter);
     addAndMakeVisible(mInputKnob);
+    addAndMakeVisible(mGateKnob);
     addAndMakeVisible(mBassKnob);
     addAndMakeVisible(mMidKnob);
     addAndMakeVisible(mHighKnob);
@@ -97,12 +108,14 @@ mOutputMeter.setBounds(mOutputMeterLayout.outLayout.x,
    
 
     mInputKnob.setLookAndFeel(&mKnobLookAndFeel);
+    mGateKnob.setLookAndFeel(&mKnobLookAndFeel);
     mBassKnob.setLookAndFeel(&mKnobLookAndFeel);
     mMidKnob.setLookAndFeel(&mKnobLookAndFeel);
     mHighKnob.setLookAndFeel(&mKnobLookAndFeel);
     mOutputKnob.setLookAndFeel(&mKnobLookAndFeel);
 
     mInputKnob.setValue(0.5);
+    mGateKnob.setValue(0.5);
     mBassKnob.setValue(0.5);
     mMidKnob.setValue(0.5);
     mHighKnob.setValue(0.5);

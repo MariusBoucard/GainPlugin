@@ -39,6 +39,14 @@ public:
 		        mInputKnobLayout.inLayout.textboxHeight = 20;
                 mInputKnobLayout.inLayout.textboxPadding = 10;
 
+                mGateKnobLayout.inLayout.x = 260;
+				mGateKnobLayout.inLayout.y = 235;
+                mGateKnobLayout.inLayout.frameWidth = 135;
+				mGateKnobLayout.inLayout.frameHeight = 153;
+                mGateKnobLayout.inLayout.ratio = 0.5f;
+				mGateKnobLayout.inLayout.textboxHeight = 20;
+                mGateKnobLayout.inLayout.textboxPadding = 10;
+
                 mBassKnobLayout.inLayout.x = 390;
                 mBassKnobLayout.inLayout.y = 235;
                 mBassKnobLayout.inLayout.frameWidth = 135;
@@ -90,6 +98,7 @@ public:
 
                 computeKnobLayout(mInputMeterLayout);
                 computeKnobLayout(mInputKnobLayout);
+                computeKnobLayout(mGateKnobLayout);
                 computeKnobLayout(mBassKnobLayout);
                 computeKnobLayout(mMidKnobLayout);
                 computeKnobLayout(mHighKnobLayout);
@@ -144,6 +153,11 @@ private:
     juce::Slider mInputKnob;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mInputAttachment;
     KnobLayout mInputKnobLayout;
+
+    juce::Slider mGateKnob;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mGateKnobAttachment;
+    KnobLayout mGateKnobLayout;
+
 
     juce::Slider mBassKnob;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mBassKnobAttachment;
