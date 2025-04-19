@@ -31,7 +31,7 @@
 #pragma once
 #include "gui.h"
 #include "NAM/dsp.h"
-
+#include "dsp/ToneStack.h"
 #include "NAM/get_dsp.h"
 
 enum EParams
@@ -138,6 +138,11 @@ private:
     AudioParameterFloat* gain;
     juce::AudioProcessorValueTreeState mParameters; 
     std::unique_ptr<nam::DSP> mModel;
+    std::unique_ptr<dsp::tone_stack::AbstractToneStack> mToneStack;
+
+    double** mDoubleBuffer = nullptr; 
+    double** mTempDoubleBuffer = nullptr; 
+
     double mBlockSize;
     double mSampleRate;
     //==============================================================================

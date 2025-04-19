@@ -96,6 +96,8 @@ jucer_project_files("GainPlugin/Source/dsp"
 #           Resource  Resource
   x         .         .         "Source/dsp/ResamplingNAM.cpp"
   .         .         .         "Source/dsp/ResamplingNAM.h"
+    x         .         .         "Source/dsp/ToneStack.cpp"
+  .         .         .         "Source/dsp/ToneStack.h"
 )
 
 jucer_project_files("GainPlugin/Source"
@@ -274,7 +276,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_subdirectory("Library/NeuralAmpModelerCore")
 target_link_libraries(GainPlugin_Shared_Code PUBLIC NAM)
 
-#add_subdirectory("Library/AudioDSPTools")
+add_subdirectory("Library/AudioDSPTools")
 
 
-#target_link_libraries(GainPlugin_Shared_Code PUBLIC AudioDSPTools)
+target_link_libraries(GainPlugin_Shared_Code PUBLIC AudioDSPTools)

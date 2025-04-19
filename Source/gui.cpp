@@ -6,13 +6,12 @@ int RootViewComponent::ROOT_WIDTH = 1000;
 int RootViewComponent::ROOT_HEIGHT = 550;
 
 RootViewComponent::RootViewComponent(juce::AudioProcessor& processor)
-    : AudioProcessorEditor(processor) // Correct initialization
+    : AudioProcessorEditor(processor)
 {
-    auto& gainProcessor = processor; // Cast to GainProcessor
+    auto& gainProcessor = processor; 
 
-    // Load the image from BinaryData
-    auto imageData = BinaryData::plate_png; // Replace 'plate_png' with the actual name of your resource
-    auto imageDataSize = BinaryData::plate_pngSize; // Replace 'plate_pngSize' with the actual size of your resource
+    auto imageData = BinaryData::plate_png;
+    auto imageDataSize = BinaryData::plate_pngSize;
 
     mImage = juce::ImageFileFormat::loadFrom(imageData, imageDataSize);
 
@@ -21,36 +20,67 @@ RootViewComponent::RootViewComponent(juce::AudioProcessor& processor)
 
     // Set the size of the editor
     setSize(ROOT_WIDTH,ROOT_HEIGHT);
+
+    defineKnobLayout();
+
     configureNodes(gainProcessor);
 }
 
-void RootViewComponent::configureNodes(juce::AudioProcessor& gainProcessor)
+void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
 {
-
-    int textboxHeight = 20; 
-    mGainKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
-    mGainKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, textboxHeight);
-    
     auto bounds = getLocalBounds();
-    int frameWidth = 135;  
-    int frameHeight = 153;
-    float ratio = 0.5f;
+    AmpAudioProcessor* ampAudioProcessor = dynamic_cast<AmpAudioProcessor*>(&inProcessor);
 
-    int sliderWidth = frameWidth * ratio;
-    int sliderHeight = ( frameHeight + textboxHeight + 10 ) * ratio;
-    AmpAudioProcessor* gainProcessorG = dynamic_cast<AmpAudioProcessor*>(&gainProcessor);
+    mInputKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+    mBassKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+    mMidKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+    mHighKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
 
-    mGainAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        gainProcessorG->getCustomParameterTree(), "input", mGainKnob);
+    mInputKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mInputKnobLayout.inLayout.textboxHeight);
+    mBassKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mBassKnobLayout.inLayout.textboxHeight);
+    mMidKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mMidKnobLayout.inLayout.textboxHeight);
+    mHighKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, mHighKnobLayout.inLayout.textboxHeight);
 
-    mGainKnob.setBounds(180,
-        235,
-        sliderWidth,
-        sliderHeight);
+    mInputAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+        ampAudioProcessor->getCustomParameterTree(), "input", mInputKnob);
+    mBassKnobAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+		ampAudioProcessor->getCustomParameterTree(), "bass", mBassKnob);
+    mMidKnobAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+        ampAudioProcessor->getCustomParameterTree(), "mid", mMidKnob);
+    mHighKnobAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+        ampAudioProcessor->getCustomParameterTree(), "high", mHighKnob);
 
-    addAndMakeVisible(mGainKnob);
-    mGainKnob.setLookAndFeel(&mKnobLookAndFeel);
-	mGainKnob.setValue(0.5);
+    mInputKnob.setBounds(mInputKnobLayout.outLayout.x,
+                         mInputKnobLayout.outLayout.y,
+                         mInputKnobLayout.outLayout.sliderWidth,
+                         mInputKnobLayout.outLayout.sliderHeight);
+    mBassKnob.setBounds(mBassKnobLayout.outLayout.x,
+                        mBassKnobLayout.outLayout.y,
+        		        mBassKnobLayout.outLayout.sliderWidth,
+        		        mBassKnobLayout.outLayout.sliderHeight);
+    mMidKnob.setBounds(mMidKnobLayout.outLayout.x,
+        					   mMidKnobLayout.outLayout.y,
+        					   mMidKnobLayout.outLayout.sliderWidth,
+        					   mMidKnobLayout.outLayout.sliderHeight);
+    mHighKnob.setBounds(mHighKnobLayout.outLayout.x,
+                        mHighKnobLayout.outLayout.y,
+                        mHighKnobLayout.outLayout.sliderWidth,
+                        mHighKnobLayout.outLayout.sliderHeight);
+
+    addAndMakeVisible(mInputKnob);
+    addAndMakeVisible(mBassKnob);
+    addAndMakeVisible(mMidKnob);
+    addAndMakeVisible(mHighKnob);
+
+    mInputKnob.setLookAndFeel(&mKnobLookAndFeel);
+    mBassKnob.setLookAndFeel(&mKnobLookAndFeel);
+    mMidKnob.setLookAndFeel(&mKnobLookAndFeel);
+    mHighKnob.setLookAndFeel(&mKnobLookAndFeel);
+
+    mInputKnob.setValue(0.5);
+    mBassKnob.setValue(0.5);
+    mMidKnob.setValue(0.5);
+    mHighKnob.setValue(0.5);
 }
 
 void RootViewComponent::paint(juce::Graphics& g)
@@ -79,6 +109,6 @@ void RootViewComponent::resized()
 {
     auto bounds = getLocalBounds();
 
-    mGainKnob.setBounds(bounds.getCentreX() - 50, bounds.getCentreY() - 50, 100, 100); // 100x100 knob
+    //mInputKnob.setBounds(bounds.getCentreX() - 50, bounds.getCentreY() - 50, 100, 100); // 100x100 knob
     // Handle resizing logic if needed
 }
