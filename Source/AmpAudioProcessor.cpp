@@ -40,7 +40,6 @@ AmpAudioProcessor::AmpAudioProcessor()
         }
     }
     mToneStack->Reset(getSampleRate(), getBlockSize());
-
     mModel = nam::get_dsp(std::filesystem::path("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\Library\\NeuralAmpModelerCore\\example_models\\Metal lead.nam"));//loadModel("kk");
     this->createEditor();
     mModel->ResetAndPrewarm(mSampleRate, mBlockSize); // Set the sample rate and block size
@@ -82,9 +81,9 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
 
 
     //// Set tone stack parameters
-    mToneStack->SetParam("bass", mParameters.getParameterAsValue("bass").getValue());
+   /* mToneStack->SetParam("bass", mParameters.getParameterAsValue("bass").getValue());
     mToneStack->SetParam("middle", mParameters.getParameterAsValue("mid").getValue());
-    mToneStack->SetParam("high", mParameters.getParameterAsValue("high").getValue());
+    mToneStack->SetParam("high", mParameters.getParameterAsValue("high").getValue());*/
 
     //// Process the tone stack
     mTempDoubleBuffer = mToneStack->Process(mDoubleBuffer, isMono, numSamples);

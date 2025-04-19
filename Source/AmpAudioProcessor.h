@@ -111,11 +111,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createPar
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override
     {
-        MemoryOutputStream (destData, true).writeFloat (*gain);
+       // MemoryOutputStream (destData, true).writeFloat (*gain);
     }
 
     void setStateInformation (const void* data, int sizeInBytes) override
     {
+      //  mParameters.setStateInformation (data, sizeInBytes);
     }
 
     //==============================================================================
