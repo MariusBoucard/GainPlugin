@@ -1,6 +1,8 @@
 #pragma once
-#include "looknfeel/StripKnob_look_n_feel.h"
-#include "looknfeel/ToogleButtonLookAndFeel.h"
+#include "../looknfeel/StripKnob_look_n_feel.h"
+#include "../looknfeel/ToogleButtonLookAndFeel.h"
+#include "../looknfeel/TopBarLookAndFeel.h"
+#include "TopBarComponent.h"
 #include <JuceHeader.h>
 
 class RootViewComponent : public juce::AudioProcessorEditor
@@ -32,7 +34,13 @@ public:
 
     void defineKnobLayout()
     {
-
+        mTopBarLayout.inLayout.x = 0;
+        mTopBarLayout.inLayout.y = 0;
+        mTopBarLayout.inLayout.frameWidth = getLocalBounds().getWidth();
+        mTopBarLayout.inLayout.frameHeight = 30;
+        mTopBarLayout.inLayout.ratio = 1.f;
+        mTopBarLayout.inLayout.textboxHeight = 0;
+        mTopBarLayout.inLayout.textboxPadding = 0;
 
         mInputKnobLayout.inLayout.x = 180;
 		mInputKnobLayout.inLayout.y = 235;
@@ -161,6 +169,7 @@ public:
         computeKnobLayout(mNAMButtonLayout);
         computeKnobLayout(mIRVerbButtonLayout);
         computeKnobLayout(mVerbMixKnobLayout);
+        computeKnobLayout(mTopBarLayout);
     }
 
     void computeKnobLayout(KnobLayout& inKnobLayout)
@@ -203,6 +212,7 @@ public:
             repaint();
         }
     };
+
 private:
     juce::Image mImage;
     MeterComponent mInputMeter;
@@ -254,12 +264,14 @@ private:
     juce::ComboBox mFileChooserButton;
     KnobLayout mFileChooserButtonLayout;
 
-    juce::OwnedArray<juce::File> mNAMFileList;
     KnobLayout mNAMChooserButtonLayout;
     juce::ComboBox mNAMChooserButton;
 
     juce::OwnedArray<juce::File> mIRFileList;
+    juce::OwnedArray<juce::File> mNAMFileList;
 
+    TopBarComponent mTopBar;
+    KnobLayout mTopBarLayout;
 
 
     juce::FileChooser mFileChooser;

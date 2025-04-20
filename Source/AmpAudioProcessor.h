@@ -29,7 +29,7 @@
 *******************************************************************************/
 
 #pragma once
-#include "gui.h"
+#include "ui/gui.h"
 #include "NAM/dsp.h"
 #include "dsp/ToneStack.h"
 #include "dsp/NoiseGate.h"

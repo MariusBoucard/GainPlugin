@@ -76,6 +76,7 @@ jucer_project_files("GainPlugin/looknfeel"
 #           Resource  Resource
   .         .         .         "Source/looknfeel/StripKnob_look_n_feel.h"
   .         .         .         "Source/looknfeel/ToogleButtonLookAndFeel.h"        
+  .         .         .         "Source/looknfeel/TopBarLookAndFeel.h"
 )
 
 jucer_project_files("GainPlugin/ressources"
@@ -88,8 +89,10 @@ jucer_project_files("GainPlugin/ressources"
 jucer_project_files("GainPlugin/Source/ui"
 # Compile   Xcode     Binary    File
 #           Resource  Resource
-  .         .         .         "Source/gui.h"
-  x         .         .         "Source/gui.cpp"
+  .         .         .         "Source/ui/gui.h"
+  x         .         .         "Source/ui/gui.cpp"
+  .         .         .         "Source/ui/TopBarComponent.h"
+  x         .         .         "Source/ui/TopBarComponent.cpp"
 )
 
 jucer_project_files("GainPlugin/Source/dsp"

@@ -1,6 +1,6 @@
 #include "gui.h"
 
-#include "AmpAudioProcessor.h"
+#include "../AmpAudioProcessor.h"
 #include <JuceHeader.h>
 int RootViewComponent::ROOT_WIDTH = 980;
 int RootViewComponent::ROOT_HEIGHT = 550;
@@ -10,10 +10,8 @@ RootViewComponent::RootViewComponent(juce::AudioProcessor& processor)
     , mInputMeter(processor)
     , mOutputMeter(processor,false)
     , mFileChooser("choose NAM file")
-
+    , mTopBar(processor)
 {
-
-
     auto& gainProcessor = processor; 
 
     auto imageData = BinaryData::plate_png;
@@ -82,6 +80,7 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
         }
      };
 
+    
     mInputKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mBassKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mMidKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
@@ -181,6 +180,10 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
 							mVerbMixKnobLayout.outLayout.y,
 							mVerbMixKnobLayout.outLayout.sliderWidth,
 							mVerbMixKnobLayout.outLayout.sliderHeight);
+    mTopBar.setBounds(mTopBarLayout.outLayout.x,
+        						mTopBarLayout.outLayout.y,
+        						mTopBarLayout.outLayout.sliderWidth,
+        						mTopBarLayout.outLayout.sliderHeight);
 
 
     addAndMakeVisible(mInputMeter);
@@ -197,6 +200,7 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
     addAndMakeVisible(mNAMButton);
     addAndMakeVisible(mIRVerbButton);
     addAndMakeVisible(mVerbMixKnob);
+    addAndMakeVisible(mTopBar);
    
 
     mInputKnob.setLookAndFeel(&mKnobLookAndFeel);
@@ -208,6 +212,7 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
     mVerbMixKnob.setLookAndFeel(&mKnobLookAndFeel);
     mFileChooserButton.setLookAndFeel(&mToggleButtonLookAndFeel);
     mNAMChooserButton.setLookAndFeel(&mToggleButtonLookAndFeel);
+    mTopBar.setLookAndFeel(&mToggleButtonLookAndFeel);
 
     mInputKnob.setValue(0.5);
     mGateKnob.setValue(0.5);
@@ -310,3 +315,4 @@ void RootViewComponent::MeterComponent::paint(juce::Graphics& g)
 
 	    g.setColour(juce::Colours::blue);
 }
+
