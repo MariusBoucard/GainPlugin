@@ -28,12 +28,11 @@ RootViewComponent::RootViewComponent(juce::AudioProcessor& processor)
     defineKnobLayout();
 
     configureNodes(gainProcessor);
+    updatePath(gainProcessor);
 }
 
-void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
+void RootViewComponent::updatePath(AudioProcessor& inProcessor)
 {
-    auto bounds = getLocalBounds();
-
     AmpAudioProcessor* ampAudioProcessor = dynamic_cast<AmpAudioProcessor*>(&inProcessor);
 
     DirectoryIterator iter(ampAudioProcessor->getNAMPath(), false, "*", juce::File::findFiles);
@@ -49,14 +48,14 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
     mNAMChooserButton.setTextWhenNothingSelected("Select NAM File");
     mNAMChooserButton.setJustificationType(juce::Justification::centred);
 
-	mNAMChooserButton.onChange = [this, ampAudioProcessor]() {
+    mNAMChooserButton.onChange = [this, ampAudioProcessor]() {
         int selectedId = mNAMChooserButton.getSelectedId();
         if (selectedId > 0 && selectedId <= mNAMFileList.size())
         {
             juce::File selectedFile = *mNAMFileList[selectedId - 1];
             handleSelectedNAMFile(selectedFile);
         }
-	};
+        };
 
     DirectoryIterator iter2(ampAudioProcessor->getIRPath(), false, "*", juce::File::findFiles);
     int itemId2 = 1;
@@ -78,7 +77,13 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
             juce::File selectedFile = *mIRFileList[selectedId - 1];
             handleSelectedFile(selectedFile);
         }
-     };
+        };
+}
+void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
+{
+    auto bounds = getLocalBounds();
+
+    AmpAudioProcessor* ampAudioProcessor = dynamic_cast<AmpAudioProcessor*>(&inProcessor);
 
     
     mInputKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
@@ -214,13 +219,6 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
     mNAMChooserButton.setLookAndFeel(&mToggleButtonLookAndFeel);
     mTopBar.setLookAndFeel(&mToggleButtonLookAndFeel);
 
-    mInputKnob.setValue(0.5);
-    mGateKnob.setValue(0.5);
-    mBassKnob.setValue(0.5);
-    mMidKnob.setValue(0.5);
-    mHighKnob.setValue(0.5);
-    mOutputKnob.setValue(0.5);
-    mVerbMixKnob.setValue(0.5);
 }
 
 void RootViewComponent::handleSelectedFile(const juce::File& file)
@@ -252,6 +250,7 @@ void RootViewComponent::openNAMFileChooser()
         handleSelectedNAMFile(chooser.getResult());
     }
 }
+
 void RootViewComponent::handleSelectedNAMFile(const juce::File& file)
 {
 	DBG("Handling NAM file: " << file.getFullPathName());

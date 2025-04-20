@@ -72,23 +72,30 @@ public:
 
 
 
-juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createParameterLayout()
-{
-    std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
+    juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createParameterLayout()
+    {
+        std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
 
-    params.push_back (std::make_unique<juce::AudioParameterFloat> ("input", "Input", 0.0f, 1.0f, 0.5f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("gate", "Gate", 0.0f, 1.0f, 0.5f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("bass", "Bass", 0.0f, 1.0f, 0.5f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("mid", "Mid", 0.0f, 1.0f, 0.5f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("high", "High", 0.0f, 1.0f, 0.5f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("output", "Output", 0.0f, 1.0f, 0.5f));
-    params.push_back(std::make_unique<juce::AudioParameterBool>("irEnabled", "IREnabled", false));
-    params.push_back(std::make_unique<juce::AudioParameterBool>("namEnabled", "NAMEnabled", true));
-    params.push_back(std::make_unique<juce::AudioParameterBool>("irVerbEnabled", "IRVerbEnabled", false));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("irVerbMix", "irVerbMix", 0.0f, 1.0f, 0.5f));
+        params.push_back (std::make_unique<juce::AudioParameterFloat> ("input", "Input", 0.0f, 1.0f, 0.5f));
+        params.push_back(std::make_unique<juce::AudioParameterFloat>("gate", "Gate", 0.0f, 1.0f, 0.5f));
+        params.push_back(std::make_unique<juce::AudioParameterFloat>("bass", "Bass", 0.0f, 1.0f, 0.5f));
+        params.push_back(std::make_unique<juce::AudioParameterFloat>("mid", "Mid", 0.0f, 1.0f, 0.5f));
+        params.push_back(std::make_unique<juce::AudioParameterFloat>("high", "High", 0.0f, 1.0f, 0.5f));
+        params.push_back(std::make_unique<juce::AudioParameterFloat>("output", "Output", 0.0f, 1.0f, 0.5f));
+        params.push_back(std::make_unique<juce::AudioParameterBool>("irEnabled", "IREnabled", false));
+        params.push_back(std::make_unique<juce::AudioParameterBool>("namEnabled", "NAMEnabled", true));
+        params.push_back(std::make_unique<juce::AudioParameterBool>("irVerbEnabled", "IRVerbEnabled", false));
+        params.push_back(std::make_unique<juce::AudioParameterFloat>("irVerbMix", "irVerbMix", 0.0f, 1.0f, 0.5f));
+  
+        juce::StringArray irPathChoices;
+        irPathChoices.add("NAM");
+        irPathChoices.add("IRAmp");
+        irPathChoices.add("IRVerb");
+        params.push_back(std::make_unique<juce::AudioParameterChoice>("NAMPath", "namPath", irPathChoices, 0));
 
-    return { params.begin(), params.end() };
-}
+
+        return { params.begin(), params.end() };
+    }
     //==============================================================================
     void prepareToPlay (double, int) override {}
     void releaseResources() override {}
@@ -155,7 +162,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createPar
                 mNoiseGateTrigger->SetSampleRate(44100);
             }
         }
-
     private:
          dsp::tone_stack::AbstractToneStack* mToneStack; // Pointer to the tone stack
          dsp::noise_gate::Gain* mNoiseGateGain; // Pointer to the noise gate gain
@@ -165,13 +171,25 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createPar
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override
     {
-       // MemoryOutputStream (destData, true).writeFloat (*gain);
+        //mParameters.state.setProperty("irPath", mIRPath.getFullPathName(), nullptr);
+        //mParameters.state.setProperty("irVerbPath", mIRVerbPath.getFullPathName(), nullptr);
+        //mParameters.state.setProperty("namPath", mNAMPath.getFullPathName(), nullptr);
+
+        juce::MemoryOutputStream stream(destData, true);
+        mParameters.state.writeToStream(stream);  
     }
 
     void setStateInformation (const void* data, int sizeInBytes) override
     {
-        //MemoryInputStream (data, sizeInBytes, false).readFloat (*mParameters);
-      //  mParameters.setStateInformation (data, sizeInBytes);
+          // Restore the state of the ValueTree
+        juce::MemoryInputStream stream(data, static_cast<size_t>(sizeInBytes), false);
+        auto newState = juce::ValueTree::readFromStream(stream);
+
+        if (newState.isValid())
+        {
+            mParameters.state = newState;
+            
+        }
     }
 
     double getRmsLevelLeft() const { return mRmsLevelLeft.load(); }
@@ -206,6 +224,22 @@ juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createPar
 	{
 		return mNAMPath;
 	}
+    void setIRPath(const juce::File& path)
+    {
+        mIRPath = path;
+        mParameters.state.setProperty("irPath", path.getFullPathName(), nullptr);
+    }
+    void setIRVerbPath(const juce::File& path)
+    {
+        mIRVerbPath = path;
+        mParameters.state.setProperty("irVerbPath", path.getFullPathName(), nullptr);
+    }
+    void setNAMPath(const juce::File& path)
+    {
+        mNAMPath = path;
+
+        mParameters.state.setProperty("namPath", path.getFullPathName(), nullptr);
+    }
 
 private:
     //==============================================================================

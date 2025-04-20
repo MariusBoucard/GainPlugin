@@ -180,11 +180,13 @@ public:
         inKnobLayout.outLayout.sliderHeight = (inKnobLayout.inLayout.frameHeight + inKnobLayout.inLayout.textboxHeight + 10) * inKnobLayout.inLayout.ratio;
 	}
 
+
     void openFileChooser();
     void openNAMFileChooser();
     void handleSelectedFile(const juce::File& file);
     void handleSelectedNAMFile(const juce::File& file);
 
+    void updatePath(juce::AudioProcessor& path);
     void configureNodes(juce::AudioProcessor& gainProcessor);
 
     void paint(juce::Graphics& g) override;
