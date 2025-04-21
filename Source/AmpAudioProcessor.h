@@ -36,29 +36,6 @@
 #include "dsp/ImpulseResponse.h"
 #include "NAM/get_dsp.h"
 
-enum EParams
-{
-    // These need to be the first ones because I use their indices to place
-    // their rects in the GUI.
-    kInputLevel = 0,
-    kNoiseGateThreshold,
-    kToneBass,
-    kToneMid,
-    kToneTreble,
-    kOutputLevel,
-    // The rest is fine though.
-    kNoiseGateActive,
-    kEQActive,
-    kIRToggle,
-    // Input calibration
-    kCalibrateInput,
-    kInputCalibrationLevel,
-    kOutputMode,
-    kNumParams
-};
-
-const int numKnobs = 6;
-
 //==============================================================================
 class AmpAudioProcessor final : public AudioProcessor
 {
@@ -68,9 +45,8 @@ public:
     AmpAudioProcessor();
 
     ~AmpAudioProcessor() override;
-    double getNAMSamplerate(const std::unique_ptr<nam::DSP>& inModel);
 
-
+    juce::File createJucePathFromFile(const juce::String& filePath);
 
     juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createParameterLayout()
     {
@@ -86,13 +62,6 @@ public:
         params.push_back(std::make_unique<juce::AudioParameterBool>("namEnabled", "NAMEnabled", true));
         params.push_back(std::make_unique<juce::AudioParameterBool>("irVerbEnabled", "IRVerbEnabled", false));
         params.push_back(std::make_unique<juce::AudioParameterFloat>("irVerbMix", "irVerbMix", 0.0f, 1.0f, 0.5f));
-  
-        juce::StringArray irPathChoices;
-        irPathChoices.add("NAM");
-        irPathChoices.add("IRAmp");
-        irPathChoices.add("IRVerb");
-        params.push_back(std::make_unique<juce::AudioParameterChoice>("NAMPath", "namPath", irPathChoices, 0));
-
 
         return { params.begin(), params.end() };
     }
@@ -105,7 +74,11 @@ public:
 
 
     //==============================================================================
-    AudioProcessorEditor* createEditor() override          { return new RootViewComponent (*this); }
+    AudioProcessorEditor* createEditor() override {
+        auto editor = new RootViewComponent(*this);
+        editor->updatePath();
+        return editor;
+    }
     bool hasEditor() const override                        { return true;   }
 
     //==============================================================================
@@ -171,23 +144,29 @@ public:
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override
     {
-        //mParameters.state.setProperty("irPath", mIRPath.getFullPathName(), nullptr);
-        //mParameters.state.setProperty("irVerbPath", mIRVerbPath.getFullPathName(), nullptr);
-        //mParameters.state.setProperty("namPath", mNAMPath.getFullPathName(), nullptr);
-
         juce::MemoryOutputStream stream(destData, true);
         mParameters.state.writeToStream(stream);  
     }
 
     void setStateInformation (const void* data, int sizeInBytes) override
     {
-          // Restore the state of the ValueTree
         juce::MemoryInputStream stream(data, static_cast<size_t>(sizeInBytes), false);
         auto newState = juce::ValueTree::readFromStream(stream);
 
         if (newState.isValid())
         {
             mParameters.state = newState;
+            
+            mIRPath = createJucePathFromFile(mParameters.state.getProperty("irPath").toString());
+            mIRVerbPath = createJucePathFromFile(mParameters.state.getProperty("irVerbPath").toString());
+			mNAMPath = createJucePathFromFile(mParameters.state.getProperty("namPath").toString());
+
+            if(getActiveEditor() != nullptr)
+			{
+                RootViewComponent* rootView = dynamic_cast<RootViewComponent*>(getActiveEditor());
+				rootView->updatePath();
+			}
+
             
         }
     }
@@ -237,7 +216,6 @@ public:
     void setNAMPath(const juce::File& path)
     {
         mNAMPath = path;
-
         mParameters.state.setProperty("namPath", path.getFullPathName(), nullptr);
     }
 

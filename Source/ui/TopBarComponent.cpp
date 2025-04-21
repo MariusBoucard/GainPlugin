@@ -25,7 +25,7 @@ void TopBarComponent::showSettingsModal(AudioProcessor& inProcessor)
 
 }
 
-void TopBarComponent::SettingsModal::openDirectoryChooser()
+void TopBarComponent::SettingsModal::openDirectoryChooser(DirectoryType inDirectoryType)
 {
     juce::FileChooser chooser("Select a Directory",
                             juce::File::getSpecialLocation(juce::File::userHomeDirectory),
@@ -35,17 +35,15 @@ void TopBarComponent::SettingsModal::openDirectoryChooser()
 
         if (chooser.browseForDirectory())
         {
-            handleSelectedDirectory(chooser.getResult());
+            handleSelectedDirectory(chooser.getResult(), inDirectoryType);
         }
     
 }
 
-void TopBarComponent::SettingsModal::handleSelectedDirectory(const juce::File& directory)
+void TopBarComponent::SettingsModal::handleSelectedDirectory(const juce::File& directory, DirectoryType inDirectoryType)
 {
-    // Example: Save the selected directory path to the processor
         if (directory.exists() && directory.isDirectory())
 	        {
-		        // Assuming you have a method in your processor to handle the directory
                 AmpAudioProcessor * processor = dynamic_cast<AmpAudioProcessor*>(&mProcessor);
             if (processor == nullptr)
             {
@@ -54,10 +52,22 @@ void TopBarComponent::SettingsModal::handleSelectedDirectory(const juce::File& d
             }
             else
             {
-                processor->setNAMPath(directory.getFullPathName());
+                switch (inDirectoryType)
+                {
+                case TopBarComponent::SettingsModal::DirectoryType::NAMDir:
+                    processor->setNAMPath(directory.getFullPathName());
+                    break;
+                case TopBarComponent::SettingsModal::DirectoryType::IRDir:
+                    processor->setIRPath(directory.getFullPathName());
+                    break;
+                case TopBarComponent::SettingsModal::DirectoryType::VerbIRDir:
+                    break;
+                default:
+                    break;
+                }
                 if (auto* parentEditor = dynamic_cast<RootViewComponent*>(getParentComponent()))
                 {
-                    parentEditor->updatePath(mProcessor);
+                    parentEditor->updatePath();
                 }
             }
 	    }
@@ -67,5 +77,4 @@ void TopBarComponent::SettingsModal::handleSelectedDirectory(const juce::File& d
 	    }
     DBG("Handling directory: " << directory.getFullPathName());
 
-    // You can pass this directory to your processor or store it in a parameter
 }

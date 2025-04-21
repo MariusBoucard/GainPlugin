@@ -13,13 +13,13 @@
 #include <filesystem>
 #include <iostream>
 
-juce::File createJucePathFromFile(const juce::String& filePath)
+juce::File AmpAudioProcessor::createJucePathFromFile(const juce::String& filePath)
 {
-    juce::File file(filePath); // Create a juce::File object from the file path
+    juce::File file(filePath); 
     if (!file.existsAsFile() and !file.exists())
     {
         DBG("File does not exist: " << filePath);
-        return juce::File(); // Return an empty file if it doesn't exist
+        return juce::File(); 
     }
 
 
@@ -29,7 +29,7 @@ juce::File createJucePathFromFile(const juce::String& filePath)
 AmpAudioProcessor::AmpAudioProcessor()
     : AudioProcessor(BusesProperties().withInput("Input", AudioChannelSet::mono())
     . withOutput("Output", AudioChannelSet::stereo()))
-    , mParameters(*this, nullptr, "PARAMETERS", createParameterLayout()) // Initialize parameters
+    , mParameters(*this, nullptr, "PARAMETERS", createParameterLayout())
     , mBlockSize(256)
     , mSampleRate(44100)
     , mToneStack(new dsp::tone_stack::BasicNamToneStack())
@@ -72,10 +72,10 @@ AmpAudioProcessor::AmpAudioProcessor()
     mModel = nam::get_dsp(std::filesystem::path("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\Library\\NeuralAmpModelerCore\\example_models\\Metal lead.nam"));
     mModel->ResetAndPrewarm(mSampleRate, mBlockSize);
 
+    /* TODO Can't work anymore as we don't use same path for mIRPath now */
     loadImpulseResponse(mIRPath);
     loadImpulseResponseVerb(mIRVerbPath);
 
-    this->createEditor();
 }
 AmpAudioProcessor::~AmpAudioProcessor()
 {
@@ -90,7 +90,7 @@ AmpAudioProcessor::~AmpAudioProcessor()
 
 void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
 {
-   buffer.applyGain(mParameters.getParameterAsValue("input").getValue()); // Apply input gain
+   buffer.applyGain(mParameters.getParameterAsValue("input").getValue());
    
     int isMono = 1;
 
@@ -256,7 +256,6 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
 
         float rms = std::sqrt(sum / numSamples);
 
-        // Update the atomic variables
         if (channel == 0)
         {
             mRmsOutputLevelLeft.store(rms);

@@ -28,16 +28,16 @@ RootViewComponent::RootViewComponent(juce::AudioProcessor& processor)
     defineKnobLayout();
 
     configureNodes(gainProcessor);
-    updatePath(gainProcessor);
 }
 
-void RootViewComponent::updatePath(AudioProcessor& inProcessor)
+void RootViewComponent::updatePath()
 {
-    AmpAudioProcessor* ampAudioProcessor = dynamic_cast<AmpAudioProcessor*>(&inProcessor);
+    AmpAudioProcessor* ampAudioProcessor = dynamic_cast<AmpAudioProcessor*>(&processor);
 
     DirectoryIterator iter(ampAudioProcessor->getNAMPath(), false, "*", juce::File::findFiles);
     int itemId = 1;
-
+    mNAMFileList.clear();
+	mNAMChooserButton.clear();
     while (iter.next())
     {
         auto file = iter.getFile();
@@ -50,16 +50,18 @@ void RootViewComponent::updatePath(AudioProcessor& inProcessor)
 
     mNAMChooserButton.onChange = [this, ampAudioProcessor]() {
         int selectedId = mNAMChooserButton.getSelectedId();
-        if (selectedId > 0 && selectedId <= mNAMFileList.size())
-        {
-            juce::File selectedFile = *mNAMFileList[selectedId - 1];
-            handleSelectedNAMFile(selectedFile);
-        }
+            if (selectedId > 0 && selectedId <= mNAMFileList.size())
+            {
+                juce::File selectedFile = *mNAMFileList[selectedId - 1];
+                handleSelectedNAMFile(selectedFile);
+            }
         };
 
     DirectoryIterator iter2(ampAudioProcessor->getIRPath(), false, "*", juce::File::findFiles);
     int itemId2 = 1;
 
+    mIRFileList.clear();
+    mFileChooserButton.clear();
     while (iter2.next())
     {
         auto file = iter2.getFile();
@@ -84,7 +86,6 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
     auto bounds = getLocalBounds();
 
     AmpAudioProcessor* ampAudioProcessor = dynamic_cast<AmpAudioProcessor*>(&inProcessor);
-
     
     mInputKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mBassKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);

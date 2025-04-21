@@ -186,7 +186,7 @@ public:
     void handleSelectedFile(const juce::File& file);
     void handleSelectedNAMFile(const juce::File& file);
 
-    void updatePath(juce::AudioProcessor& path);
+    void updatePath();
     void configureNodes(juce::AudioProcessor& gainProcessor);
 
     void paint(juce::Graphics& g) override;

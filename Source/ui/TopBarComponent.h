@@ -41,15 +41,28 @@ public:
     class SettingsModal : public juce::Component
     {
     public:
+
+        enum class DirectoryType{
+            NAMDir,
+            IRDir,
+            VerbIRDir
+        } ;
+
         SettingsModal(AudioProcessor& inProcessor)
             : mProcessor(inProcessor)
         {
             setLookAndFeel(&mLookAndFeel);
 
-            addAndMakeVisible(mDirectoryChooserButton);
-            mDirectoryChooserButton.setButtonText("Choose Directory");
-            mDirectoryChooserButton.setColour(juce::TextButton::buttonColourId, juce::Colours::blue);
-            mDirectoryChooserButton.onClick = [this]() { openDirectoryChooser(); };
+            addAndMakeVisible(mDirectoryChooserNAMButton);
+            mDirectoryChooserNAMButton.setButtonText("Choose Directory for NAM Models");
+            mDirectoryChooserNAMButton.setColour(juce::TextButton::buttonColourId, juce::Colours::blue);
+            mDirectoryChooserNAMButton.onClick = [this]() { openDirectoryChooser(DirectoryType::NAMDir); };
+
+
+            addAndMakeVisible(mDirectoryChooserIRButton);
+            mDirectoryChooserIRButton.setButtonText("Choose Directory for cab IR");
+            mDirectoryChooserIRButton.setColour(juce::TextButton::buttonColourId, juce::Colours::blue);
+            mDirectoryChooserIRButton.onClick = [this]() { openDirectoryChooser(DirectoryType::IRDir); };
 
             addAndMakeVisible(mCloseButton);
             mCloseButton.setButtonText("Close");
@@ -68,15 +81,17 @@ public:
         {
             auto area = getLocalBounds().reduced(40); // Add padding
             mTitleLabel.setBounds(area.removeFromTop(50)); // Title at the top
-            mDirectoryChooserButton.setBounds(area.removeFromTop(50).reduced(0, 10));
+            mDirectoryChooserNAMButton.setBounds(area.removeFromTop(50).reduced(0, 10));
+            mDirectoryChooserIRButton.setBounds(area.removeFromTop(80).reduced(0, 10));
             mCloseButton.setBounds(area.removeFromTop(50).reduced(0, 10));
         }
 
-        void openDirectoryChooser();
-        void handleSelectedDirectory(const juce::File& directory);
+        void openDirectoryChooser(DirectoryType inDirectoryType);
+        void handleSelectedDirectory(const juce::File& directory, DirectoryType inDirectoryType);
     private:
         juce::AudioProcessor& mProcessor;
-        juce::TextButton mDirectoryChooserButton{ "Choose Directory" };
+        juce::TextButton mDirectoryChooserNAMButton{ "Choose Directory" };
+        juce::TextButton mDirectoryChooserIRButton{ "Close" };
         juce::TextButton mCloseButton{ "Close" };
         juce::Label mTitleLabel; // Title label
         SettingsModalLookAndFeel mLookAndFeel; // Custom LookAndFeel
@@ -90,7 +105,7 @@ private:
     juce::AudioProcessor& audioProcessor;
     juce::TextButton mAboutButton{ "About" };
     juce::TextButton mSettingButton{ "settings" };
-    juce::TextButton mDirectoryChooserButton{ "Open Directory" };
+   // juce::TextButton mDirectoryChooserButton{ "Open Directory" };
     juce::Label mAmpNameLabel{ "Amp Name" };
 
     void showAboutModal()
