@@ -279,7 +279,7 @@ private:
     juce::FileChooser mFileChooser;
 
     KnobLookAndFeel mKnobLookAndFeel; 
-    ToggleButtonLookAndFeel mToggleButtonLookAndFeel; // Custom LookAndFeel
+    DropDownLookAndFeel mDropDownLookAndFeel; // Custom LookAndFeel
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RootViewComponent)
 };

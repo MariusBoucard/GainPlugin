@@ -78,3 +78,38 @@ public:
         g.drawText(label.getText(), label.getLocalBounds(), juce::Justification::centredLeft, true);
     }
 };
+
+
+class TopBarButtonLookAndFeel : public juce::LookAndFeel_V4
+{
+public:
+    // Custom button background drawing
+    void drawButtonBackground(juce::Graphics& g, juce::Button& button, const juce::Colour& backgroundColour, bool isMouseOverButton, bool isButtonDown) override
+    {
+        auto bounds = button.getLocalBounds().toFloat();
+
+        // Transparent background by default
+        juce::Colour baseColour = juce::Colours::transparentBlack;
+
+        // Dark background on hover
+        if (isMouseOverButton)
+            baseColour = juce::Colours::black.withAlpha(0.5f);
+
+        g.setColour(baseColour);
+        g.fillRect(bounds); // Fill the button background
+    }
+
+    // Custom button text drawing
+    void drawButtonText(juce::Graphics& g, juce::TextButton& button, bool isMouseOverButton, bool isButtonDown) override
+    {
+        auto font = juce::Font(16.0f, juce::Font::bold); // Font size and style
+        g.setFont(font);
+
+        // Text color: light grey by default, white on hover
+        juce::Colour textColour = isMouseOverButton ? juce::Colours::white : juce::Colours::lightgrey;
+        g.setColour(textColour);
+
+        auto bounds = button.getLocalBounds();
+        g.drawText(button.getButtonText(), bounds, juce::Justification::centred, true); // Centered text
+    }
+};

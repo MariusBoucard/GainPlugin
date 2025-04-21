@@ -8,18 +8,20 @@ public:
     TopBarComponent(juce::AudioProcessor& processor)
         : audioProcessor(processor)
     {
-
+        mAboutButton.setLookAndFeel(&mButtonLookNFeel);
         addAndMakeVisible(mAboutButton);
-        mAboutButton.setButtonText("L");
+        mAboutButton.setButtonText("About");
         mAboutButton.setColour(juce::TextButton::buttonColourId, juce::Colours::red);
         mAboutButton.onClick = [this]() { showAboutModal(); };
 
+        mSettingButton.setLookAndFeel(&mButtonLookNFeel);
         addAndMakeVisible(mSettingButton);
-        mSettingButton.setButtonText("R");
+        mSettingButton.setButtonText("Setting");
         mSettingButton.setColour(juce::TextButton::buttonColourId, juce::Colours::red);
         mSettingButton.onClick = [this]() { showSettingsModal(audioProcessor); };
 
 		mAmpNameLabel.setLookAndFeel(&mLabelLookAndFeel);
+
         addAndMakeVisible(mAmpNameLabel);
         mAmpNameLabel.setText("Ballzzy Audio", juce::dontSendNotification); 
         mAmpNameLabel.setJustificationType(juce::Justification::centred); 
@@ -27,14 +29,22 @@ public:
 
     }
 
+    ~TopBarComponent() override
+	{
+		mAboutButton.setLookAndFeel(nullptr);
+		mSettingButton.setLookAndFeel(nullptr);
+		mAmpNameLabel.setLookAndFeel(nullptr);
+		setLookAndFeel(nullptr); 
+	}
+
     void paint(juce::Graphics& g) override;
 
     void resized() override
     {
         auto buttonSize = getHeight();
-        mAboutButton.setBounds(0, 0, buttonSize, buttonSize);
-        mSettingButton.setBounds(getWidth() - buttonSize, 0, buttonSize, buttonSize);
-        mAmpNameLabel.setBounds(buttonSize, 0, getWidth() - 2 * buttonSize, buttonSize);
+        mAboutButton.setBounds(0, 0, buttonSize*2, buttonSize);
+        mSettingButton.setBounds(getWidth() - buttonSize*2, 0, buttonSize*2, buttonSize);
+        mAmpNameLabel.setBounds(buttonSize*2, 0, getWidth() - 2 * buttonSize*2, buttonSize);
     }
 
     class SettingsModal : public juce::Component
@@ -50,12 +60,12 @@ public:
         SettingsModal(AudioProcessor& inProcessor);
      
         ~SettingsModal() override {
-mDirectoryChooserNAMButton.setLookAndFeel(nullptr);
-		mDirectoryChooserIRButton.setLookAndFeel(nullptr);
-mCloseButton.setLookAndFeel(nullptr);
-		mTitleLabel.setLookAndFeel(nullptr);
-mNAMPathLabel.setLookAndFeel(nullptr);
-		mIRPathLabel.setLookAndFeel(nullptr);
+            mDirectoryChooserNAMButton.setLookAndFeel(nullptr);
+		    mDirectoryChooserIRButton.setLookAndFeel(nullptr);
+            mCloseButton.setLookAndFeel(nullptr);
+		    mTitleLabel.setLookAndFeel(nullptr);
+            mNAMPathLabel.setLookAndFeel(nullptr);
+	    	mIRPathLabel.setLookAndFeel(nullptr);
 
             setLookAndFeel(nullptr); 
         };
@@ -89,6 +99,7 @@ mNAMPathLabel.setLookAndFeel(nullptr);
         juce::Label mNAMPathLabel{ "No NAM Path Selected" };
         juce::Label mIRPathLabel{ "No IR Path Selected" };
         juce::Label mTitleLabel{"Amplifier Settings"};
+
         SettingsModalLookAndFeel mLookAndFeel; 
         ModalButtonDefaultLookAndFeel mModalButtonLookAndFeel;
     };
@@ -98,6 +109,8 @@ private:
 
 
 private:
+    TopBarButtonLookAndFeel mButtonLookNFeel;
+
     juce::AudioProcessor& audioProcessor;
     juce::TextButton mAboutButton{ "About" };
     juce::TextButton mSettingButton{ "settings" };

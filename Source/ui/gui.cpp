@@ -216,10 +216,8 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
     mHighKnob.setLookAndFeel(&mKnobLookAndFeel);
     mOutputKnob.setLookAndFeel(&mKnobLookAndFeel);
     mVerbMixKnob.setLookAndFeel(&mKnobLookAndFeel);
-    mFileChooserButton.setLookAndFeel(&mToggleButtonLookAndFeel);
-    mNAMChooserButton.setLookAndFeel(&mToggleButtonLookAndFeel);
-    mTopBar.setLookAndFeel(&mToggleButtonLookAndFeel);
-
+    mFileChooserButton.setLookAndFeel(&mDropDownLookAndFeel);
+    mNAMChooserButton.setLookAndFeel(&mDropDownLookAndFeel);
 }
 
 void RootViewComponent::handleSelectedFile(const juce::File& file)
