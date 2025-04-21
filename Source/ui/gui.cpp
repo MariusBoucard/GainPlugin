@@ -70,6 +70,19 @@ void RootViewComponent::updatePath()
             }
         };
 
+    juce::File selectedNAMFile = ampAudioProcessor->getDirectNAMPath();
+    if (selectedNAMFile.existsAsFile())
+    {
+        mNAMChooserButton.setText(selectedNAMFile.getFileName(), juce::dontSendNotification);
+    }
+    else
+    {
+        mNAMChooserButton.setTextWhenNothingSelected("Select Fucking NAM Bro");
+    }
+
+    mFileChooserButton.setJustificationType(juce::Justification::centred);
+
+
     DirectoryIterator iter2(ampAudioProcessor->getIRPath(), false, "*", juce::File::findFiles);
     int itemId2 = 1;
 
@@ -82,8 +95,17 @@ void RootViewComponent::updatePath()
         mFileChooserButton.addItem(file.getFileName(), itemId2++);
     }
 
-    mFileChooserButton.setTextWhenNothingSelected("Select IR File");
     mFileChooserButton.setJustificationType(juce::Justification::centred);
+
+    juce::File selectedIRFile = ampAudioProcessor->getDirectIRPath();
+    if (selectedIRFile.existsAsFile())
+    {
+		mFileChooserButton.setText(selectedIRFile.getFileName(), juce::dontSendNotification);
+	}
+    else
+    {
+		mFileChooserButton.setTextWhenNothingSelected("Select IR File");
+	}
 
     mFileChooserButton.onChange = [this, ampAudioProcessor]() {
         int selectedId = mFileChooserButton.getSelectedId();
@@ -92,7 +114,7 @@ void RootViewComponent::updatePath()
             juce::File selectedFile = *mIRFileList[selectedId - 1];
             handleSelectedFile(selectedFile);
         }
-        };
+    };
 }
 void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
 {
@@ -107,10 +129,6 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
     mOutputKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mGateKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mVerbMixKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
-
-    //mIRButton.setButtonText("IR");
-    //mNAMButton.setButtonText("NAM");
-    //mIRVerbButton.setButtonText("IR Verb");
 
     mIRButton.setLookAndFeel(&mToggleLookAndFeel);
     mNAMButton.setLookAndFeel(&mToggleLookAndFeel);
@@ -242,29 +260,6 @@ void RootViewComponent::handleSelectedFile(const juce::File& file)
     DBG("Handling file: " << file.getFullPathName());
     AmpAudioProcessor& audioProcessor = static_cast<AmpAudioProcessor&>(processor);
     audioProcessor.loadImpulseResponse(file);
-}
-void RootViewComponent::openFileChooser()
-{
-    juce::FileChooser chooser("Select an Impulse Response File",
-        juce::File{},
-        "*.wav");
-
-    if (chooser.browseForFileToOpen())
-    {
-        handleSelectedFile(chooser.getResult());
-    }
-}
-
-void RootViewComponent::openNAMFileChooser()
-{
-    juce::FileChooser chooser("Select NAM File",
-        juce::File{},
-        "*.nam");
-
-    if (chooser.browseForFileToOpen())
-    {
-        handleSelectedNAMFile(chooser.getResult());
-    }
 }
 
 void RootViewComponent::handleSelectedNAMFile(const juce::File& file)

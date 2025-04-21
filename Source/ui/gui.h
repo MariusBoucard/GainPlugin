@@ -155,6 +155,14 @@ public:
 		mVerbMixKnobLayout.inLayout.textboxHeight = 20;
         mVerbMixKnobLayout.inLayout.textboxPadding = -15;
 
+        mVerbDropDownLayout.inLayout.x = 320;
+        mVerbDropDownLayout.inLayout.y = 235;
+        mVerbDropDownLayout.inLayout.frameWidth = 135;
+        mVerbDropDownLayout.inLayout.frameHeight = 153;
+        mVerbDropDownLayout.inLayout.ratio = 0.5f;
+        mVerbDropDownLayout.inLayout.textboxHeight = 20;
+        mVerbDropDownLayout.inLayout.textboxPadding = -15;
+
 
         computeKnobLayout(mInputMeterLayout);
         computeKnobLayout(mInputKnobLayout);
@@ -171,6 +179,7 @@ public:
         computeKnobLayout(mIRVerbButtonLayout);
         computeKnobLayout(mVerbMixKnobLayout);
         computeKnobLayout(mTopBarLayout);
+        computeKnobLayout(mVerbDropDownLayout);
     }
 
     void computeKnobLayout(KnobLayout& inKnobLayout)
@@ -181,9 +190,6 @@ public:
         inKnobLayout.outLayout.sliderHeight = (inKnobLayout.inLayout.frameHeight + inKnobLayout.inLayout.textboxHeight + 10) * inKnobLayout.inLayout.ratio;
 	}
 
-
-    void openFileChooser();
-    void openNAMFileChooser();
     void handleSelectedFile(const juce::File& file);
     void handleSelectedNAMFile(const juce::File& file);
 
@@ -270,8 +276,12 @@ private:
     KnobLayout mNAMChooserButtonLayout;
     juce::ComboBox mNAMChooserButton;
 
+    juce::ComboBox mVerbDropDown;
+    KnobLayout mVerbDropDownLayout;
+
     juce::OwnedArray<juce::File> mIRFileList;
     juce::OwnedArray<juce::File> mNAMFileList;
+    juce::OwnedArray<juce::File> mVerbFileList;
 
     TopBarComponent mTopBar;
 
@@ -281,7 +291,7 @@ private:
     juce::FileChooser mFileChooser;
 
     KnobLookAndFeel mKnobLookAndFeel; 
-    DropDownLookAndFeel mDropDownLookAndFeel; // Custom LookAndFeel
+    DropDownLookAndFeel mDropDownLookAndFeel; 
     ToggleButtonLookAndFeel mToggleLookAndFeel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RootViewComponent)

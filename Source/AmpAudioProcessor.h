@@ -97,6 +97,7 @@ public:
     void loadImpulseResponse(const juce::File& path);
     void loadImpulseResponseVerb(const juce::File& path);
     void loadNAMFile(const juce::File& path);
+
     dsp::wav::LoadReturnCode stageIR(const juce::File& path);
     dsp::wav::LoadReturnCode stageIRVerb(const juce::File& path);
 	
@@ -161,13 +162,19 @@ public:
             mIRVerbPath = createJucePathFromFile(mParameters.state.getProperty("irVerbPath").toString());
 			mNAMPath = createJucePathFromFile(mParameters.state.getProperty("namPath").toString());
 
+            mDirectNAMPath = createJucePathFromFile(mParameters.state.getProperty("directNAMPath").toString());
+            mDirectIRPath = createJucePathFromFile(mParameters.state.getProperty("directIRPath").toString());
+            mDirectIRVerbPath = createJucePathFromFile(mParameters.state.getProperty("directIRVerbPath").toString());
+
+            loadNAMFile(mDirectNAMPath);
+            loadImpulseResponse(mDirectIRPath);
+            loadImpulseResponseVerb(mDirectIRVerbPath);
+
             if(getActiveEditor() != nullptr)
 			{
                 RootViewComponent* rootView = dynamic_cast<RootViewComponent*>(getActiveEditor());
 				rootView->updatePath();
-			}
-
-            
+			}  
         }
     }
 
@@ -191,34 +198,65 @@ public:
         return mParameters;
     }
 
+    // TODO Getters
     juce::File& getIRPath()
 	{
 		return mIRPath;
 	}
+    juce::File& getDirectIRPath()
+    {
+		return mDirectIRPath;
+	}
+
     juce::File& getIRVerbPath()
     {
         return mIRVerbPath;
     }
+    juce::File& getDirectIRVerbPath()
+    {
+		return mDirectIRVerbPath;
+	}
     juce::File& getNAMPath()
 	{
 		return mNAMPath;
 	}
+    juce::File& getDirectNAMPath()
+    {
+        return mDirectNAMPath;
+    }
+
     void setIRPath(const juce::File& path)
     {
         mIRPath = path;
         mParameters.state.setProperty("irPath", path.getFullPathName(), nullptr);
     }
-    void setIRVerbPath(const juce::File& path)
+    void setDirectIRPath(const juce::File& path)
     {
-        mIRVerbPath = path;
-        mParameters.state.setProperty("irVerbPath", path.getFullPathName(), nullptr);
-    }
+		mDirectIRPath = path;
+		mParameters.state.setProperty("directIRPath", path.getFullPathName(), nullptr);
+	}
     void setNAMPath(const juce::File& path)
     {
         mNAMPath = path;
         mParameters.state.setProperty("namPath", path.getFullPathName(), nullptr);
     }
+    void setDirectNAMPath(const juce::File& path)
+    {
+		mDirectNAMPath = path;
+		mParameters.state.setProperty("directNAMPath", path.getFullPathName(), nullptr);
+	}
 
+    void setIRVerbPath(const juce::File& path)
+    {
+        mIRVerbPath = path;
+        mParameters.state.setProperty("irVerbPath", path.getFullPathName(), nullptr);
+    }
+    void setDirectIRVerbPath(const juce::File& path)
+    {
+		mDirectIRVerbPath = path;
+		mParameters.state.setProperty("directIRVerbPath", path.getFullPathName(), nullptr);
+	}
+    // FIN TODO
 private:
     //==============================================================================
     AudioParameterFloat* gain;
@@ -236,6 +274,10 @@ private:
     juce::File mIRPath;
     juce::File mIRVerbPath;
     juce::File mNAMPath;
+
+    juce::File mDirectNAMPath;
+    juce::File mDirectIRPath;
+    juce::File mDirectIRVerbPath;
 
     bool mIsIRActive;
     bool mIsNAMEnabled;

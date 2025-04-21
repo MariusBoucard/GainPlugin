@@ -40,8 +40,11 @@ AmpAudioProcessor::AmpAudioProcessor()
     , mIsNAMEnabled(true)
     , mIsIRActive(false)
     , mIRPath(createJucePathFromFile("D:\\Projets musique\\vst\\Amps\\Revv V30 Fredman Impulse Response\\Wav\\"))
-    , mIRVerbPath(createJucePathFromFile("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\ressources\\verbIR\\HallVerb.wav"))
+    , mIRVerbPath(createJucePathFromFile("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\ressources\\verbIR\\"))
     , mNAMPath(createJucePathFromFile("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\ressources\\namModels\\Fender"))
+    , mDirectNAMPath(createJucePathFromFile("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\Library\\NeuralAmpModelerCore\\example_models\\Metal lead.nam"))
+    , mDirectIRPath(createJucePathFromFile("D:\\Projets musique\\vst\\Amps\\Revv V30 Fredman Impulse Response\\Wav\\"))
+    , mDirectIRVerbPath(createJucePathFromFile("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\ressources\\verbIR\\HallVerb.wav"))
 {
     mNoiseGateTrigger->AddListener(mNoiseGateGain);
 
@@ -70,12 +73,10 @@ AmpAudioProcessor::AmpAudioProcessor()
     mParameters.addParameterListener("gate", &mParamListener);
     
     mToneStack->Reset(getSampleRate(), getBlockSize());
-    mModel = nam::get_dsp(std::filesystem::path("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\Library\\NeuralAmpModelerCore\\example_models\\Metal lead.nam"));
-    mModel->ResetAndPrewarm(mSampleRate, mBlockSize);
 
     /* TODO Can't work anymore as we don't use same path for mIRPath now */
-    loadImpulseResponse(mIRPath);
-    loadImpulseResponseVerb(mIRVerbPath);
+    loadImpulseResponse(mDirectIRPath);
+    loadImpulseResponseVerb(mDirectIRVerbPath);
 
 }
 AmpAudioProcessor::~AmpAudioProcessor()
@@ -268,6 +269,7 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
         }
     }
 }
+
 void AmpAudioProcessor::loadImpulseResponse(const juce::File& inIRFile)
 {
     stageIR(inIRFile);
@@ -281,6 +283,7 @@ void AmpAudioProcessor::loadImpulseResponse(const juce::File& inIRFile)
 		std::cerr << "Failed to load impulse response." << std::endl;
 	}
 }
+
 void AmpAudioProcessor::loadImpulseResponseVerb(const juce::File& inIRFile)
 {
     stageIRVerb(inIRFile);
@@ -301,7 +304,8 @@ void AmpAudioProcessor::loadNAMFile(const juce::File& inNAMFile)
 	{
         mIsNAMEnabled = false;
 		mModel = nam::get_dsp(std::filesystem::path(inNAMFile.getFullPathName().toStdString()));
-		mModel->ResetAndPrewarm(mSampleRate, mBlockSize); // Set the sample rate and block size
+		mModel->ResetAndPrewarm(mSampleRate, mBlockSize);
+        setDirectNAMPath(inNAMFile);
         mIsNAMEnabled = true;
 	}
 	catch (const std::exception& e)
@@ -312,13 +316,13 @@ void AmpAudioProcessor::loadNAMFile(const juce::File& inNAMFile)
 
 dsp::wav::LoadReturnCode AmpAudioProcessor::stageIR(const juce::File& irPath)
 {
-    juce::File previousIRPath = mIRPath;
+    juce::File previousIRPath = mDirectIRPath;
     const double sampleRate = getSampleRate();
     dsp::wav::LoadReturnCode wavState = dsp::wav::LoadReturnCode::ERROR_OTHER;
     try
     {
-        juce::String irPathString = irPath.getFullPathName();;
-        const char* irPathChar = irPathString.toRawUTF8();    // Convert to const char*
+        juce::String irPathString = irPath.getFullPathName();
+        const char* irPathChar = irPathString.toRawUTF8(); 
 
         mStagedIR = std::make_unique<dsp::ImpulseResponse>(irPathChar, sampleRate);
         wavState = mStagedIR->GetWavState();
@@ -332,8 +336,7 @@ dsp::wav::LoadReturnCode AmpAudioProcessor::stageIR(const juce::File& irPath)
 
     if (wavState == dsp::wav::LoadReturnCode::SUCCESS)
     {
-        mIRPath = irPath;
-     
+        setDirectIRPath(irPath);
     }
     else
     {
@@ -341,7 +344,7 @@ dsp::wav::LoadReturnCode AmpAudioProcessor::stageIR(const juce::File& irPath)
         {
             mStagedIR = nullptr;
         }
-        mIRPath = previousIRPath;
+        setDirectIRPath(previousIRPath);
     }
 
     return wavState;
@@ -349,13 +352,13 @@ dsp::wav::LoadReturnCode AmpAudioProcessor::stageIR(const juce::File& irPath)
 
 dsp::wav::LoadReturnCode AmpAudioProcessor::stageIRVerb(const juce::File& irPath)
 {
-    juce::File previousIRPath = mIRVerbPath;
+    juce::File previousIRPath = mDirectIRVerbPath;
     const double sampleRate = getSampleRate();
     dsp::wav::LoadReturnCode wavState = dsp::wav::LoadReturnCode::ERROR_OTHER;
     try
     {
         juce::String irPathString = irPath.getFullPathName();;
-        const char* irPathChar = irPathString.toRawUTF8();    // Convert to const char*
+        const char* irPathChar = irPathString.toRawUTF8(); 
 
         mStagedIRVerb = std::make_unique<dsp::ImpulseResponse>(irPathChar, sampleRate);
         wavState = mStagedIRVerb->GetWavState();
@@ -369,8 +372,7 @@ dsp::wav::LoadReturnCode AmpAudioProcessor::stageIRVerb(const juce::File& irPath
 
     if (wavState == dsp::wav::LoadReturnCode::SUCCESS)
     {
-        mIRVerbPath = irPath;
-
+        setDirectIRVerbPath(irPath);
     }
     else
     {
@@ -378,7 +380,7 @@ dsp::wav::LoadReturnCode AmpAudioProcessor::stageIRVerb(const juce::File& irPath
         {
             mStagedIRVerb = nullptr;
         }
-        mIRVerbPath = previousIRPath;
+        setDirectIRVerbPath(previousIRPath);
     }
 
     return wavState;
