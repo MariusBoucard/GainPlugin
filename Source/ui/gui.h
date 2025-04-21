@@ -31,6 +31,7 @@ public:
     static int ROOT_WIDTH;
     static int ROOT_HEIGHT;
     RootViewComponent(juce::AudioProcessor& processor);
+    ~RootViewComponent() override;
 
     void defineKnobLayout()
     {

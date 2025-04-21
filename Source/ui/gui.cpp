@@ -30,6 +30,19 @@ RootViewComponent::RootViewComponent(juce::AudioProcessor& processor)
     configureNodes(gainProcessor);
 }
 
+RootViewComponent::~RootViewComponent()
+{
+	mInputKnob.setLookAndFeel(nullptr);
+	mGateKnob.setLookAndFeel(nullptr);
+	mBassKnob.setLookAndFeel(nullptr);
+	mMidKnob.setLookAndFeel(nullptr);
+	mHighKnob.setLookAndFeel(nullptr);
+	mOutputKnob.setLookAndFeel(nullptr);
+	mVerbMixKnob.setLookAndFeel(nullptr);
+	mFileChooserButton.setLookAndFeel(nullptr);
+	mNAMChooserButton.setLookAndFeel(nullptr);
+}
+
 void RootViewComponent::updatePath()
 {
     AmpAudioProcessor* ampAudioProcessor = dynamic_cast<AmpAudioProcessor*>(&processor);
