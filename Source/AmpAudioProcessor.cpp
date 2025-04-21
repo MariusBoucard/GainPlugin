@@ -39,12 +39,12 @@ AmpAudioProcessor::AmpAudioProcessor()
     , mParamListener(mToneStack, mNoiseGateGain, mNoiseGateTrigger)
     , mIsNAMEnabled(true)
     , mIsIRActive(false)
-    , mIRPath(createJucePathFromFile("D:\\Projets musique\\vst\\Amps\\Revv V30 Fredman Impulse Response\\Wav\\"))
-    , mIRVerbPath(createJucePathFromFile("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\ressources\\verbIR\\"))
-    , mNAMPath(createJucePathFromFile("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\ressources\\namModels\\Fender"))
-    , mDirectNAMPath(createJucePathFromFile("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\Library\\NeuralAmpModelerCore\\example_models\\Metal lead.nam"))
-    , mDirectIRPath(createJucePathFromFile("D:\\Projets musique\\vst\\Amps\\Revv V30 Fredman Impulse Response\\Wav\\"))
-    , mDirectIRVerbPath(createJucePathFromFile("C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\ressources\\verbIR\\HallVerb.wav"))
+    , mIRPath()
+    , mIRVerbPath()
+    , mNAMPath()
+    , mDirectNAMPath()
+    , mDirectIRPath()
+    , mDirectIRVerbPath()
 {
     mNoiseGateTrigger->AddListener(mNoiseGateGain);
 
