@@ -19,12 +19,12 @@ public:
         mSettingButton.setColour(juce::TextButton::buttonColourId, juce::Colours::red);
         mSettingButton.onClick = [this]() { showSettingsModal(audioProcessor); };
 
+		mAmpNameLabel.setLookAndFeel(&mLabelLookAndFeel);
         addAndMakeVisible(mAmpNameLabel);
-        mAmpNameLabel.setText("My Amp", juce::dontSendNotification); 
+        mAmpNameLabel.setText("Ballzzy Audio", juce::dontSendNotification); 
         mAmpNameLabel.setJustificationType(juce::Justification::centred); 
         mAmpNameLabel.setFont(juce::Font(18.0f, juce::Font::bold));
-        mAmpNameLabel.setColour(juce::Label::textColourId, juce::Colours::white);
-        mAmpNameLabel.setColour(juce::Label::backgroundColourId, juce::Colours::darkgrey);
+
     }
 
     void paint(juce::Graphics& g) override;
@@ -35,7 +35,6 @@ public:
         mAboutButton.setBounds(0, 0, buttonSize, buttonSize);
         mSettingButton.setBounds(getWidth() - buttonSize, 0, buttonSize, buttonSize);
         mAmpNameLabel.setBounds(buttonSize, 0, getWidth() - 2 * buttonSize, buttonSize);
-
     }
 
     class SettingsModal : public juce::Component
@@ -48,53 +47,50 @@ public:
             VerbIRDir
         } ;
 
-        SettingsModal(AudioProcessor& inProcessor)
-            : mProcessor(inProcessor)
-        {
-            setLookAndFeel(&mLookAndFeel);
-
-            addAndMakeVisible(mDirectoryChooserNAMButton);
-            mDirectoryChooserNAMButton.setButtonText("Choose Directory for NAM Models");
-            mDirectoryChooserNAMButton.setColour(juce::TextButton::buttonColourId, juce::Colours::blue);
-            mDirectoryChooserNAMButton.onClick = [this]() { openDirectoryChooser(DirectoryType::NAMDir); };
-
-
-            addAndMakeVisible(mDirectoryChooserIRButton);
-            mDirectoryChooserIRButton.setButtonText("Choose Directory for cab IR");
-            mDirectoryChooserIRButton.setColour(juce::TextButton::buttonColourId, juce::Colours::blue);
-            mDirectoryChooserIRButton.onClick = [this]() { openDirectoryChooser(DirectoryType::IRDir); };
-
-            addAndMakeVisible(mCloseButton);
-            mCloseButton.setButtonText("Close");
-            mCloseButton.onClick = [this]() { exitModalState(0); };
-        }
+        SettingsModal(AudioProcessor& inProcessor);
+     
         ~SettingsModal() override {
-            setLookAndFeel(nullptr); // Reset LookAndFeel to default
+mDirectoryChooserNAMButton.setLookAndFeel(nullptr);
+		mDirectoryChooserIRButton.setLookAndFeel(nullptr);
+mCloseButton.setLookAndFeel(nullptr);
+		mTitleLabel.setLookAndFeel(nullptr);
+mNAMPathLabel.setLookAndFeel(nullptr);
+		mIRPathLabel.setLookAndFeel(nullptr);
+
+            setLookAndFeel(nullptr); 
         };
 
         void paint(juce::Graphics& g) override
         {
-            mLookAndFeel.drawComponentBackground(g, *this); // Use custom LookAndFeel to draw the background
+            mLookAndFeel.drawComponentBackground(g, *this);
         }
 
         void resized() override
         {
-            auto area = getLocalBounds().reduced(40); // Add padding
-            mTitleLabel.setBounds(area.removeFromTop(50)); // Title at the top
+            auto area = getLocalBounds().reduced(40); 
+            mTitleLabel.setBounds(area.removeFromTop(50)); 
+            mNAMPathLabel.setBounds(area.removeFromTop(30).reduced(0, 5));
             mDirectoryChooserNAMButton.setBounds(area.removeFromTop(50).reduced(0, 10));
-            mDirectoryChooserIRButton.setBounds(area.removeFromTop(80).reduced(0, 10));
+
+            mIRPathLabel.setBounds(area.removeFromTop(30).reduced(0, 5));
+            mDirectoryChooserIRButton.setBounds(area.removeFromTop(50).reduced(0, 10));
+
             mCloseButton.setBounds(area.removeFromTop(50).reduced(0, 10));
         }
 
         void openDirectoryChooser(DirectoryType inDirectoryType);
         void handleSelectedDirectory(const juce::File& directory, DirectoryType inDirectoryType);
+
     private:
         juce::AudioProcessor& mProcessor;
         juce::TextButton mDirectoryChooserNAMButton{ "Choose Directory" };
         juce::TextButton mDirectoryChooserIRButton{ "Close" };
         juce::TextButton mCloseButton{ "Close" };
-        juce::Label mTitleLabel; // Title label
-        SettingsModalLookAndFeel mLookAndFeel; // Custom LookAndFeel
+        juce::Label mNAMPathLabel{ "No NAM Path Selected" };
+        juce::Label mIRPathLabel{ "No IR Path Selected" };
+        juce::Label mTitleLabel{"Amplifier Settings"};
+        SettingsModalLookAndFeel mLookAndFeel; 
+        ModalButtonDefaultLookAndFeel mModalButtonLookAndFeel;
     };
 
 private:
@@ -105,8 +101,8 @@ private:
     juce::AudioProcessor& audioProcessor;
     juce::TextButton mAboutButton{ "About" };
     juce::TextButton mSettingButton{ "settings" };
-   // juce::TextButton mDirectoryChooserButton{ "Open Directory" };
     juce::Label mAmpNameLabel{ "Amp Name" };
+    BeautifulLabelLookAndFeel mLabelLookAndFeel; 
 
     void showAboutModal()
     {
