@@ -13,6 +13,7 @@
 #include <filesystem>
 #include <iostream>
 
+
 juce::File AmpAudioProcessor::createJucePathFromFile(const juce::String& filePath)
 {
     juce::File file(filePath); 
@@ -142,6 +143,7 @@ void AmpAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
     for (int channel = 0; channel < isMono; ++channel)
     {
         auto* floatData = buffer.getReadPointer(channel);
+
         std::copy(floatData, floatData + numSamples, mFloatBuffer[channel]);
     }
 

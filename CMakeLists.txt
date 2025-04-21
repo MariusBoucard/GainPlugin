@@ -84,6 +84,7 @@ jucer_project_files("GainPlugin/ressources"
 #           Resource  Resource
   .         x         x         "Source/ressources/knob_strip.png"
   .         x         x         "Source/ressources/plate.png"
+  .         x         x         "Source/ressources/toggleButtonStrip.png"
 )
 
 jucer_project_files("GainPlugin/Source/ui"

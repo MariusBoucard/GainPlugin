@@ -59,9 +59,6 @@ public:
         g.setColour(juce::Colours::limegreen);
         g.drawRect(bounds, 2.0f); // Border thickness of 2.0f
 
-
-      
-
         // Draw the text
         g.setColour(juce::Colours::white);
         g.setFont(label.getFont());
@@ -69,4 +66,65 @@ public:
     }
 private:
     juce::Image mKnobStrip;
+};
+
+
+
+
+class ToggleButtonLookAndFeel : public juce::LookAndFeel_V4
+{
+public:
+    ToggleButtonLookAndFeel()
+    {
+        // Load the strip image from BinaryData
+        auto imageData = BinaryData::toggleButtonStrip_png; // Replace with your strip image name
+        auto imageDataSize = BinaryData::toggleButtonStrip_pngSize; // Replace with your strip image size
+        mToggleStrip = juce::ImageFileFormat::loadFrom(imageData, imageDataSize);
+
+        if (mToggleStrip.isNull())
+            DBG("Failed to load toggle strip image from resources");
+    }
+
+    void drawToggleButton(juce::Graphics& g, juce::ToggleButton& button, bool isMouseOverButton, bool isButtonDown) override
+    {
+        auto bounds = button.getLocalBounds();
+
+        const int numFrames = 2; // Assuming the strip has 2 frames: "off" and "on"
+        const int frameHeight = mToggleStrip.getHeight() / numFrames;
+
+        if (frameHeight <= 0)
+        {
+            DBG("Invalid frameHeight. Check your image dimensions.");
+            return;
+        }
+
+        // Determine the frame to display based on the toggle state
+        int frameIndex = button.getToggleState() ? 1 : 0;
+
+        if (frameIndex * frameHeight >= mToggleStrip.getHeight())
+        {
+            DBG("Invalid frameIndex. Check your calculations.");
+            return;
+        }
+        // Destination coordinates and dimensions
+        int destX = bounds.getX();
+        int destY = bounds.getY();
+        int destWidth = bounds.getWidth();
+        int destHeight = bounds.getHeight();
+
+        // Source coordinates and dimensions
+        int sourceX = 0;
+        int sourceY = frameIndex * frameHeight;
+        int sourceWidth = mToggleStrip.getWidth();
+        int sourceHeight = frameHeight;
+
+        // Draw the appropriate frame from the strip
+        g.drawImage(mToggleStrip,
+            destX, destY, destWidth, destHeight, // Destination
+            sourceX, sourceY, sourceWidth, sourceHeight, // Source
+            false); // Do not fill alpha c
+    }
+
+private:
+    juce::Image mToggleStrip; // The image strip for the toggle button
 };

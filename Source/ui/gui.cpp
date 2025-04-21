@@ -108,9 +108,13 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
     mGateKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mVerbMixKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
 
-    mIRButton.setButtonText("IR");
-    mNAMButton.setButtonText("NAM");
-    mIRVerbButton.setButtonText("IR Verb");
+    //mIRButton.setButtonText("IR");
+    //mNAMButton.setButtonText("NAM");
+    //mIRVerbButton.setButtonText("IR Verb");
+
+    mIRButton.setLookAndFeel(&mToggleLookAndFeel);
+    mNAMButton.setLookAndFeel(&mToggleLookAndFeel);
+    mIRVerbButton.setLookAndFeel(&mToggleLookAndFeel);
 
     mInputKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, mInputKnobLayout.inLayout.textboxHeight);
     mGateKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, mGateKnobLayout.inLayout.textboxHeight);

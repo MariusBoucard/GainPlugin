@@ -107,47 +107,47 @@ public:
         mOutputMeterLayout.inLayout.textboxHeight = 20;
 		mOutputMeterLayout.inLayout.textboxPadding = 10;
 
-        mIRButtonLayout.inLayout.x = 850;
-        mIRButtonLayout.inLayout.y = 500;
-        mIRButtonLayout.inLayout.frameWidth = 70;
-        mIRButtonLayout.inLayout.frameHeight = 60;
+        mIRButtonLayout.inLayout.x = 680;
+        mIRButtonLayout.inLayout.y = 455;
+        mIRButtonLayout.inLayout.frameWidth = 30;
+        mIRButtonLayout.inLayout.frameHeight = 30;
 		mIRButtonLayout.inLayout.ratio = 1.f;
         mIRButtonLayout.inLayout.textboxHeight = 0;
 		mIRButtonLayout.inLayout.textboxPadding = 0;
 
-        mNAMButtonLayout.inLayout.x = 850;
-        mNAMButtonLayout.inLayout.y = 50;
-        mNAMButtonLayout.inLayout.frameWidth = 70;
-        mNAMButtonLayout.inLayout.frameHeight = 60;
+        mNAMButtonLayout.inLayout.x = 660;
+        mNAMButtonLayout.inLayout.y = 60;
+        mNAMButtonLayout.inLayout.frameWidth = 30;
+        mNAMButtonLayout.inLayout.frameHeight = 30;
         mNAMButtonLayout.inLayout.ratio = 1.f;
         mNAMButtonLayout.inLayout.textboxHeight = 0;
         mNAMButtonLayout.inLayout.textboxPadding = 0;
 
-        mFileChooserButtonLayout.inLayout.x = 300;
-        mFileChooserButtonLayout.inLayout.y = 500;
-        mFileChooserButtonLayout.inLayout.frameWidth = 400;
-		mFileChooserButtonLayout.inLayout.frameHeight = 40;
+        mFileChooserButtonLayout.inLayout.x = 320;
+        mFileChooserButtonLayout.inLayout.y = 452;
+        mFileChooserButtonLayout.inLayout.frameWidth = 350;
+		mFileChooserButtonLayout.inLayout.frameHeight = 18;
         mFileChooserButtonLayout.inLayout.ratio = 1.f;
 		mFileChooserButtonLayout.inLayout.textboxHeight = 0;
         mFileChooserButtonLayout.inLayout.textboxPadding = 0;
 
-        mNAMChooserButtonLayout.inLayout.x = 300;
-        mNAMChooserButtonLayout.inLayout.y = 50;
-        mNAMChooserButtonLayout.inLayout.frameWidth = 400;
-        mNAMChooserButtonLayout.inLayout.frameHeight = 40;
+        mNAMChooserButtonLayout.inLayout.x = 327;
+        mNAMChooserButtonLayout.inLayout.y = 65;
+        mNAMChooserButtonLayout.inLayout.frameWidth = 323;
+        mNAMChooserButtonLayout.inLayout.frameHeight = 12;
         mNAMChooserButtonLayout.inLayout.ratio = 1.f;
         mNAMChooserButtonLayout.inLayout.textboxHeight = 0;
         mNAMChooserButtonLayout.inLayout.textboxPadding = 0;
 
         mIRVerbButtonLayout.inLayout.x = 800;
-        mIRVerbButtonLayout.inLayout.y = 300;
-		mIRVerbButtonLayout.inLayout.frameWidth = 200;
-        mIRVerbButtonLayout.inLayout.frameHeight = 50;
+        mIRVerbButtonLayout.inLayout.y = 200;
+		mIRVerbButtonLayout.inLayout.frameWidth = 30;
+        mIRVerbButtonLayout.inLayout.frameHeight = 30;
 		mIRVerbButtonLayout.inLayout.ratio = 1.f;
         mIRVerbButtonLayout.inLayout.textboxHeight = 0;
 		mIRVerbButtonLayout.inLayout.textboxPadding = 0;
 
-        mVerbMixKnobLayout.inLayout.x = 800;
+        mVerbMixKnobLayout.inLayout.x = 780;
 		mVerbMixKnobLayout.inLayout.y = 235;
         mVerbMixKnobLayout.inLayout.frameWidth = 135;
 		mVerbMixKnobLayout.inLayout.frameHeight = 153;
@@ -274,6 +274,7 @@ private:
     juce::OwnedArray<juce::File> mNAMFileList;
 
     TopBarComponent mTopBar;
+
     KnobLayout mTopBarLayout;
 
 
@@ -281,6 +282,7 @@ private:
 
     KnobLookAndFeel mKnobLookAndFeel; 
     DropDownLookAndFeel mDropDownLookAndFeel; // Custom LookAndFeel
+    ToggleButtonLookAndFeel mToggleLookAndFeel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RootViewComponent)
 };
