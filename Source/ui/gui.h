@@ -155,14 +155,13 @@ public:
 		mVerbMixKnobLayout.inLayout.textboxHeight = 20;
         mVerbMixKnobLayout.inLayout.textboxPadding = -15;
 
-        mVerbDropDownLayout.inLayout.x = 320;
-        mVerbDropDownLayout.inLayout.y = 235;
-        mVerbDropDownLayout.inLayout.frameWidth = 135;
-        mVerbDropDownLayout.inLayout.frameHeight = 153;
-        mVerbDropDownLayout.inLayout.ratio = 0.5f;
-        mVerbDropDownLayout.inLayout.textboxHeight = 20;
-        mVerbDropDownLayout.inLayout.textboxPadding = -15;
-
+        mVerbDropDownLayout.inLayout.x = 735;
+        mVerbDropDownLayout.inLayout.y = 185;
+        mVerbDropDownLayout.inLayout.frameWidth = 110;
+        mVerbDropDownLayout.inLayout.frameHeight = 5;
+        mVerbDropDownLayout.inLayout.ratio = 1.f;
+        mVerbDropDownLayout.inLayout.textboxHeight = 0;
+        mVerbDropDownLayout.inLayout.textboxPadding = 0;
 
         computeKnobLayout(mInputMeterLayout);
         computeKnobLayout(mInputKnobLayout);
@@ -192,6 +191,7 @@ public:
 
     void handleSelectedFile(const juce::File& file);
     void handleSelectedNAMFile(const juce::File& file);
+    void handleSelectedVerbIRFile(const juce::File& file);
 
     void updatePath();
     void configureNodes(juce::AudioProcessor& gainProcessor);
@@ -282,6 +282,7 @@ private:
     juce::OwnedArray<juce::File> mIRFileList;
     juce::OwnedArray<juce::File> mNAMFileList;
     juce::OwnedArray<juce::File> mVerbFileList;
+
 
     TopBarComponent mTopBar;
 

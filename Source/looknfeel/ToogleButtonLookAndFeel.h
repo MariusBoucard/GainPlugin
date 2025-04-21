@@ -12,12 +12,12 @@ public:
         auto bounds = juce::Rectangle<int>(0, 0, width, height).toFloat();
 
         // Background color: black with 0.8 transparency
-        g.setColour(juce::Colours::black.withAlpha(0.6f));
+        g.setColour(juce::Colours::black.withAlpha(0.2f));
         g.fillRoundedRectangle(bounds, 6.0f); // Rounded corners
 
         // Border color: green with 0.8 alpha
         g.setColour(juce::Colours::limegreen.withAlpha(0.8f));
-        g.drawRoundedRectangle(bounds, 6.0f, 2.0f); // Rounded border
+     //   g.drawRoundedRectangle(bounds, 6.0f, 2.0f); // Rounded border
 
         // Draw the arrow button (dropdown indicator)
         juce::Path arrow;

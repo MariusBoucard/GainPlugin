@@ -115,6 +115,40 @@ void RootViewComponent::updatePath()
             handleSelectedFile(selectedFile);
         }
     };
+
+    DirectoryIterator iter3(ampAudioProcessor->getIRVerbPath(), false, "*", juce::File::findFiles);
+    int itemId3 = 1;
+
+    mVerbFileList.clear();
+    mVerbDropDown.clear();
+    while (iter3.next())
+    {
+		auto file = iter3.getFile();
+		mVerbFileList.add(new juce::File(file));
+		mVerbDropDown.addItem(file.getFileName(), itemId3++);
+	}
+
+    mVerbDropDown.setJustificationType(juce::Justification::centred);
+
+	juce::File selectedIRVerbFile = ampAudioProcessor->getDirectIRVerbPath();
+    if (selectedIRVerbFile.existsAsFile())
+    {
+		mVerbDropDown.setText(selectedIRVerbFile.getFileName(), juce::dontSendNotification);
+	}
+    else
+    {
+		mVerbDropDown.setTextWhenNothingSelected("Select IR Verb File");
+	}
+
+    mVerbDropDown.onChange = [this, ampAudioProcessor]() {
+		int selectedId = mVerbDropDown.getSelectedId();
+        if (selectedId > 0 && selectedId <= mVerbFileList.size())
+        {
+			juce::File selectedFile = *mVerbFileList[selectedId - 1];
+			handleSelectedVerbIRFile(selectedFile);
+		}
+	};
+
 }
 void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
 {
@@ -225,6 +259,11 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
         						mTopBarLayout.outLayout.y,
         						mTopBarLayout.outLayout.sliderWidth,
         						mTopBarLayout.outLayout.sliderHeight);
+    mVerbDropDown.setBounds(mVerbDropDownLayout.outLayout.x,
+        								mVerbDropDownLayout.outLayout.y,
+        								mVerbDropDownLayout.outLayout.sliderWidth,
+        								mVerbDropDownLayout.outLayout.sliderHeight);
+
 
 
     addAndMakeVisible(mInputMeter);
@@ -242,6 +281,7 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
     addAndMakeVisible(mIRVerbButton);
     addAndMakeVisible(mVerbMixKnob);
     addAndMakeVisible(mTopBar);
+    addAndMakeVisible(mVerbDropDown);
    
 
     mInputKnob.setLookAndFeel(&mKnobLookAndFeel);
@@ -253,6 +293,7 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
     mVerbMixKnob.setLookAndFeel(&mKnobLookAndFeel);
     mFileChooserButton.setLookAndFeel(&mDropDownLookAndFeel);
     mNAMChooserButton.setLookAndFeel(&mDropDownLookAndFeel);
+    mVerbDropDown.setLookAndFeel(&mDropDownLookAndFeel);
 }
 
 void RootViewComponent::handleSelectedFile(const juce::File& file)
@@ -267,6 +308,13 @@ void RootViewComponent::handleSelectedNAMFile(const juce::File& file)
 	DBG("Handling NAM file: " << file.getFullPathName());
 	AmpAudioProcessor& audioProcessor = static_cast<AmpAudioProcessor&>(processor);
 	audioProcessor.loadNAMFile(file);
+}
+
+void RootViewComponent::handleSelectedVerbIRFile(const juce::File& file)
+{
+	DBG("Handling NAM file: " << file.getFullPathName());
+	AmpAudioProcessor& audioProcessor = static_cast<AmpAudioProcessor&>(processor);
+	audioProcessor.loadImpulseResponseVerb(file);
 }
 
 void RootViewComponent::paint(juce::Graphics& g)

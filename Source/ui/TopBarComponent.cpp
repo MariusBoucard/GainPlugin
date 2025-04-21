@@ -7,7 +7,7 @@ void TopBarComponent::paint(juce::Graphics& g)
     g.fillRoundedRectangle(bounds, 5.0f);
 
     g.setColour(juce::Colours::limegreen);
-    g.fillRect(bounds.removeFromBottom(3.0f));
+    g.fillRect(bounds.removeFromBottom(1.0f));
 }
 
 void TopBarComponent::showSettingsModal(AudioProcessor& inProcessor)
@@ -58,8 +58,20 @@ TopBarComponent::SettingsModal::SettingsModal(AudioProcessor& inProcessor)
 
     addAndMakeVisible(mDirectoryChooserIRButton);
     mDirectoryChooserIRButton.setButtonText("Choose Directory for cab IR");
-    mDirectoryChooserIRButton.setColour(juce::TextButton::buttonColourId, juce::Colours::blue);
+ //   mDirectoryChooserIRButton.setColour(juce::TextButton::buttonColourId, juce::Colours::blue);
     mDirectoryChooserIRButton.onClick = [this]() { openDirectoryChooser(DirectoryType::IRDir); };
+
+
+    addAndMakeVisible(mIRVerbPathLabel);
+    juce::File irVerbPath = processor.getIRVerbPath();
+    mIRVerbPathLabel.setText("IR path selected : " + irPath.getFullPathName(), juce::dontSendNotification);
+    mIRVerbPathLabel.setColour(juce::Label::textColourId, juce::Colours::lightgrey);
+    mIRVerbPathLabel.setJustificationType(juce::Justification::centredLeft);
+
+    addAndMakeVisible(mDirectoryChooserIRVerbButton);
+    mDirectoryChooserIRVerbButton.setButtonText("Choose Directory for Verb IR");
+   // mDirectoryChooserIRButton.setColour(juce::TextButton::buttonColourId, juce::Colours::blue);
+    mDirectoryChooserIRVerbButton.onClick = [this]() { openDirectoryChooser(DirectoryType::VerbIRDir); };
 
     addAndMakeVisible(mCloseButton);
     mCloseButton.setButtonText("Close");
@@ -68,9 +80,12 @@ TopBarComponent::SettingsModal::SettingsModal(AudioProcessor& inProcessor)
     mTitleLabel.setLookAndFeel(&mModalButtonLookAndFeel);
     mDirectoryChooserNAMButton.setLookAndFeel(&mModalButtonLookAndFeel);
     mDirectoryChooserIRButton.setLookAndFeel(&mModalButtonLookAndFeel);
+    mDirectoryChooserIRVerbButton.setLookAndFeel(&mModalButtonLookAndFeel);
 	mCloseButton.setLookAndFeel(&mModalButtonLookAndFeel);
     mNAMPathLabel.setLookAndFeel(&mModalButtonLookAndFeel);
     mIRPathLabel.setLookAndFeel(&mModalButtonLookAndFeel);
+    mIRVerbPathLabel.setLookAndFeel(&mModalButtonLookAndFeel);
+
 }
 
 
@@ -112,6 +127,8 @@ void TopBarComponent::SettingsModal::handleSelectedDirectory(const juce::File& d
                     mIRPathLabel.setText("IR Path : " + directory.getFullPathName(), juce::dontSendNotification);
                     break;
                 case TopBarComponent::SettingsModal::DirectoryType::VerbIRDir:
+                    processor->setIRVerbPath(directory.getFullPathName());
+                    mIRVerbPathLabel.setText("Verb IR Path : " + directory.getFullPathName(), juce::dontSendNotification);
                     break;
                 default:
                     break;

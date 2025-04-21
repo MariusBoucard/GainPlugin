@@ -66,6 +66,8 @@ public:
 		    mTitleLabel.setLookAndFeel(nullptr);
             mNAMPathLabel.setLookAndFeel(nullptr);
 	    	mIRPathLabel.setLookAndFeel(nullptr);
+            mIRVerbPathLabel.setLookAndFeel(nullptr);
+            mDirectoryChooserIRVerbButton.setLookAndFeel(nullptr);
 
             setLookAndFeel(nullptr); 
         };
@@ -85,6 +87,9 @@ public:
             mIRPathLabel.setBounds(area.removeFromTop(30).reduced(0, 5));
             mDirectoryChooserIRButton.setBounds(area.removeFromTop(50).reduced(0, 10));
 
+            mIRVerbPathLabel.setBounds(area.removeFromTop(30).reduced(0, 5));
+            mDirectoryChooserIRVerbButton.setBounds(area.removeFromTop(50).reduced(0, 10));
+
             mCloseButton.setBounds(area.removeFromTop(50).reduced(0, 10));
         }
 
@@ -95,10 +100,12 @@ public:
         juce::AudioProcessor& mProcessor;
         juce::TextButton mDirectoryChooserNAMButton{ "Choose Directory" };
         juce::TextButton mDirectoryChooserIRButton{ "Close" };
+        juce::TextButton mDirectoryChooserIRVerbButton{ "Choose Directory for cab IR" };
         juce::TextButton mCloseButton{ "Close" };
         juce::Label mNAMPathLabel{ "No NAM Path Selected" };
         juce::Label mIRPathLabel{ "No IR Path Selected" };
         juce::Label mTitleLabel{"Amplifier Settings"};
+        juce::Label mIRVerbPathLabel{ "No IR Path Selected" };
 
         SettingsModalLookAndFeel mLookAndFeel; 
         ModalButtonDefaultLookAndFeel mModalButtonLookAndFeel;

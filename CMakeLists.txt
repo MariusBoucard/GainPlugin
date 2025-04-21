@@ -52,8 +52,8 @@ jucer_audio_plugin_settings(
     "VST3"
     "Standalone"
   # PLUGIN_CHARACTERISTICS
-  PLUGIN_NAME "GainPlugin"
-  PLUGIN_DESCRIPTION "GainPlugin"
+  PLUGIN_NAME "Ballzzy's amp"
+  PLUGIN_DESCRIPTION "Amp made by ballzzy"
   PLUGIN_MANUFACTURER "JUCE"
   PLUGIN_MANUFACTURER_CODE "Manu"
   PLUGIN_CODE "Ehvd"
