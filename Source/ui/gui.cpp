@@ -303,31 +303,46 @@ void RootViewComponent::resized()
 void RootViewComponent::MeterComponent::paint(juce::Graphics& g)
 {
 
-        AmpAudioProcessor& meter = static_cast<AmpAudioProcessor&>(audioProcessor);
-        float rmsLeft = 0.0f;
-        float rmsRight = 0.0f;
+    AmpAudioProcessor& meter = static_cast<AmpAudioProcessor&>(audioProcessor);
+    float rmsLeft = 0.0f;
+    float rmsRight = 0.0f;
 
-        if (isInput)
-        {
-            rmsLeft = meter.getRmsLevelLeft();
-            rmsRight = meter.getRmsLevelRight();
-            g.setColour(juce::Colours::white);
-            rmsLeft = rmsLeft * 10;
+    if (isInput)
+    {
+        rmsLeft = meter.getRmsLevelLeft();
+        rmsRight = meter.getRmsLevelRight();
+        g.setColour(juce::Colours::white);
+        rmsLeft = rmsLeft * 10;
+    }
+    else
+    {
+        rmsLeft = meter.getRmsOutputLevelLeft();
+        rmsRight = meter.getRmsOutputLevelRight();
+        g.setColour(juce::Colours::green);
+        rmsLeft = rmsLeft * 10;
+    }
 
-        }
-        else
-        {
-			rmsLeft = meter.getRmsOutputLevelLeft();
-			rmsRight = meter.getRmsOutputLevelRight();
-            g.setColour(juce::Colours::green);
-            rmsLeft = rmsLeft*10;
+    juce::Rectangle<float> meterBounds(0, 0, getWidth(), getHeight());
+    g.setColour(juce::Colours::darkgrey.withAlpha(0.8f)); 
+    g.fillRoundedRectangle(meterBounds, 5.0f); 
 
-        }
+    // Draw the left meter bar with a gradient
+    juce::Rectangle<float> leftMeterBounds(10, getHeight() - (rmsLeft * getHeight()), getWidth() / 2 - 15, rmsLeft * getHeight());
+    juce::ColourGradient leftGradient(juce::Colours::green, leftMeterBounds.getBottomLeft(),
+        juce::Colours::limegreen, leftMeterBounds.getTopLeft(), false);
+    g.setGradientFill(leftGradient);
+    g.fillRoundedRectangle(leftMeterBounds, 3.0f); 
 
-        juce::Rectangle<float> meterBounds(0, 0, getWidth(), getHeight());
-        juce::Rectangle<float> leftMeterBounds(0, getHeight() - (rmsLeft * getHeight()), getWidth() / 2, rmsLeft * getHeight());
-        g.fillRect(juce::Rectangle<float>(10, 10, 3, rmsLeft * getHeight()));
+    // used rmsLeft as well as no rigth yet
 
-	    g.setColour(juce::Colours::blue);
+    juce::Rectangle<float> rightMeterBounds(getWidth() / 2 + 5, getHeight() - (rmsLeft * getHeight()), getWidth() / 2 - 15, rmsLeft * getHeight());
+    juce::ColourGradient rightGradient(juce::Colours::green, rightMeterBounds.getBottomLeft(),
+        juce::Colours::limegreen, rightMeterBounds.getTopLeft(), false);
+    g.setGradientFill(rightGradient);
+    g.fillRoundedRectangle(rightMeterBounds, 3.0f); // Rounded corners for the bar
+
+    // Add a border around the meter
+    g.setColour(juce::Colours::black.withAlpha(0.5f));
+    g.drawRoundedRectangle(meterBounds, 5.0f, 1.0f);
 }
 
