@@ -31,7 +31,7 @@
 #pragma once
 #include "ui/gui.h"
 #include "NAM/dsp.h"
-#include "dsp/ToneStack.h"
+#include "dsp/Bones/ToneStack.h"
 #include "dsp/NoiseGate.h"
 #include "dsp/ImpulseResponse.h"
 #include "NAM/get_dsp.h"

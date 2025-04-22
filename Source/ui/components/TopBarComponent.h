@@ -1,6 +1,6 @@
 #pragma once
 #include <JuceHeader.h>
-#include "../looknfeel/TopBarLookAndFeel.h"
+#include "../../looknfeel/TopBarLookAndFeel.h"
 
 class TopBarComponent : public juce::Component
 {

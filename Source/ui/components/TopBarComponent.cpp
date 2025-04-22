@@ -1,5 +1,5 @@
 #include "TopBarComponent.h"
-#include "../AmpAudioProcessor.h"
+#include "../../AmpAudioProcessor.h"
 void TopBarComponent::paint(juce::Graphics& g)
 {
     g.setColour(juce::Colours::darkgrey.withAlpha(0.5f));

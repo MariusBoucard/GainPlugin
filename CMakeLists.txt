@@ -74,6 +74,7 @@ jucer_audio_plugin_settings(
 jucer_project_files("GainPlugin/looknfeel"
 # Compile   Xcode     Binary    File
 #           Resource  Resource
+  .         .         .         "Source/looknfeel/GeneralLookAndFeel.h"
   .         .         .         "Source/looknfeel/StripKnob_look_n_feel.h"
   .         .         .         "Source/looknfeel/ToogleButtonLookAndFeel.h"        
   .         .         .         "Source/looknfeel/TopBarLookAndFeel.h"
@@ -92,17 +93,36 @@ jucer_project_files("GainPlugin/Source/ui"
 #           Resource  Resource
   .         .         .         "Source/ui/gui.h"
   x         .         .         "Source/ui/gui.cpp"
-  .         .         .         "Source/ui/TopBarComponent.h"
-  x         .         .         "Source/ui/TopBarComponent.cpp"
+  .         .         .     "Source/ui/gui.hpp"
 )
+jucer_project_files("GainPlugin/Source/ui/components"
+# Compile   Xcode     Binary    File
+#           Resource  Resource
+  .         .         .         "Source/ui/components/TopBarComponent.h"
+  x         .         .         "Source/ui/components/TopBarComponent.cpp"
+)
+
 
 jucer_project_files("GainPlugin/Source/dsp"
 # Compile   Xcode     Binary    File
 #           Resource  Resource
-  x         .         .         "Source/dsp/ResamplingNAM.cpp"
-  .         .         .         "Source/dsp/ResamplingNAM.h"
-    x         .         .         "Source/dsp/ToneStack.cpp"
-  .         .         .         "Source/dsp/ToneStack.h"
+
+ x        .         .          "Source/dsp/Mappers.cpp"
+ x        .         .          "Source/dsp/Mappers.h"
+ x     .         .          "Source/dsp/Processor.cpp"
+  x        .         .          "Source/dsp/Processor.h"
+
+)
+
+jucer_project_files("GainPlugin/Source/dsp/Bones"
+# Compile   Xcode     Binary    File
+#           Resource  Resource
+  x         .         .         "Source/dsp/Bones/ToneStack.cpp"
+  .         .         .         "Source/dsp/Bones/ToneStack.h"
+  x         .         .         "Source/dsp/Bones/ResamplingNAM.cpp"
+  .         .         .         "Source/dsp/Bones/ResamplingNAM.h"
+
+
 )
 
 jucer_project_files("GainPlugin/Source"

@@ -2,7 +2,7 @@
 #include "../looknfeel/StripKnob_look_n_feel.h"
 #include "../looknfeel/ToogleButtonLookAndFeel.h"
 #include "../looknfeel/TopBarLookAndFeel.h"
-#include "TopBarComponent.h"
+#include "components/TopBarComponent.h"
 #include <JuceHeader.h>
 
 class RootViewComponent : public juce::AudioProcessorEditor
@@ -295,5 +295,6 @@ private:
     DropDownLookAndFeel mDropDownLookAndFeel; 
     ToggleButtonLookAndFeel mToggleLookAndFeel;
 
+#include "gui.hpp"
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RootViewComponent)
 };
