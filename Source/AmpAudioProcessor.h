@@ -37,12 +37,10 @@
 #include "NAM/get_dsp.h"
 #include "dsp/Processor.h"
 
-//==============================================================================
 class AmpAudioProcessor final : public AudioProcessor
 {
 public:
 
-    //==============================================================================
     AmpAudioProcessor();
 
     ~AmpAudioProcessor() override;
@@ -64,30 +62,24 @@ public:
 
         return { params.begin(), params.end() };
     }
-    //==============================================================================
+
     void prepareToPlay (double, int) override {}
     void releaseResources() override {}
 
     void processBlock(AudioBuffer<float>& buffer, MidiBuffer&) override;
 
-
-
-    //==============================================================================
     AudioProcessorEditor* createEditor() override {
-        // TODO passer le processor
         auto editor = new RootViewComponent(mSkeletonAmpProcessor);
         editor->updatePath();
         return editor;
     }
     bool hasEditor() const override                        { return true;   }
 
-    //==============================================================================
     const String getName() const override                  { return "Ballzzy's NAM"; }
     bool acceptsMidi() const override                      { return false; }
     bool producesMidi() const override                     { return false; }
     double getTailLengthSeconds() const override           { return 0; }
 
-    //==============================================================================
     int getNumPrograms() override                          { return 1; }
     int getCurrentProgram() override                       { return 0; }
     void setCurrentProgram (int) override                  {}
@@ -95,7 +87,6 @@ public:
     void changeProgramName (int, const String&) override   {}
 
 
-    //==============================================================================
     void getStateInformation (MemoryBlock& destData) override
     {
         juce::MemoryOutputStream stream(destData, true);
@@ -112,18 +103,6 @@ public:
         if (newState.isValid())
         {
             mParameters.state = newState;
-            
-         /*   mIRPath = createJucePathFromFile(mParameters.state.getProperty("irPath").toString());
-            mIRVerbPath = createJucePathFromFile(mParameters.state.getProperty("irVerbPath").toString());
-			mNAMPath = createJucePathFromFile(mParameters.state.getProperty("namPath").toString());
-
-            mDirectNAMPath = createJucePathFromFile(mParameters.state.getProperty("directNAMPath").toString());
-            mDirectIRPath = createJucePathFromFile(mParameters.state.getProperty("directIRPath").toString());
-            mDirectIRVerbPath = createJucePathFromFile(mParameters.state.getProperty("directIRVerbPath").toString());
-
-            loadNAMFile(mDirectNAMPath);
-            loadImpulseResponse(mDirectIRPath);
-            loadImpulseResponseVerb(mDirectIRVerbPath);*/
             mSkeletonAmpProcessor.initState();
 
             if(getActiveEditor() != nullptr)
@@ -134,8 +113,6 @@ public:
         }
     }
 
-
-    //==============================================================================
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override
     {
         return true;
@@ -151,10 +128,8 @@ public:
     }
 
 private:
-    //==============================================================================
     juce::AudioProcessorValueTreeState mParameters; 
     SkeletonAudioProcessor mSkeletonAmpProcessor; 
 
-    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmpAudioProcessor)
 };

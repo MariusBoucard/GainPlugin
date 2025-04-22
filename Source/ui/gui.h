@@ -33,6 +33,7 @@ public:
     RootViewComponent(juce::AudioProcessor& processor);
     ~RootViewComponent() override;  
 
+    void setSliderAttachement(juce::AudioProcessor& inProcessor);
     void computeKnobLayout(KnobLayout& inKnobLayout)
     {
 	    inKnobLayout.outLayout.x = inKnobLayout.inLayout.x;
@@ -46,8 +47,6 @@ public:
     void handleSelectedVerbIRFile(const juce::File& file);
 
     void updatePath();
-    void configureNodes(juce::AudioProcessor& gainProcessor);
-
     void paint(juce::Graphics& g) override;
     void resized() override;
 
@@ -139,7 +138,6 @@ private:
     TopBarComponent mTopBar;
 
     KnobLayout mTopBarLayout;
-
 
     juce::FileChooser mFileChooser;
 

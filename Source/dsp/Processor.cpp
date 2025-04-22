@@ -38,9 +38,10 @@ SkeletonAudioProcessor::SkeletonAudioProcessor(juce::AudioProcessorValueTreeStat
     , mNoiseGateGain(new dsp::noise_gate::Gain())
     , mParamListener(mToneStack, mNoiseGateGain, mNoiseGateTrigger)
     , mIsNAMEnabled(true)
-    , mIsIRActive(false)
     , mIRPath()
     , mIRVerbPath()
+    , mIsIRLoading(true)
+    , mIsIRVerbLoading(true)
     , mNAMPath()
     , mDirectNAMPath()
     , mDirectIRPath()
@@ -74,10 +75,6 @@ SkeletonAudioProcessor::SkeletonAudioProcessor(juce::AudioProcessorValueTreeStat
 
     mToneStack->Reset(getSampleRate(), getBlockSize());
 
-    /* TODO Can't work anymore as we don't use same path for mIRPath now */
-    loadImpulseResponse(mDirectIRPath);
-    loadImpulseResponseVerb(mDirectIRVerbPath);
-
 }
 SkeletonAudioProcessor::~SkeletonAudioProcessor()
 {
@@ -89,17 +86,9 @@ SkeletonAudioProcessor::~SkeletonAudioProcessor()
     delete[] mFloatBuffer;
     delete[] mTempFloatBuffer;
 }
-
-void SkeletonAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
+void SkeletonAudioProcessor::updateMeter(bool isOutput, AudioBuffer<float>& buffer,int numSamples,int numChannels)
 {
-    buffer.applyGain(mParameters.getParameterAsValue("input").getValue());
-
-    int isMono = 1;
-
-    const int numChannels = buffer.getNumChannels();
-    const int numSamples = buffer.getNumSamples();
-
-    for (int channel = 0; channel < isMono; ++channel)
+    for (int channel = 0; channel < numChannels; ++channel)
     {
         auto* channelData = buffer.getReadPointer(channel);
         float sum = 0.0f;
@@ -117,6 +106,18 @@ void SkeletonAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer
             mRmsLevelRight.store(rms);
         }
     }
+}
+void SkeletonAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer&)
+{
+    buffer.applyGain(mParameters.getParameterAsValue("input").getValue());
+
+    int isMono = 1;
+
+    const int numChannels = buffer.getNumChannels();
+    const int numSamples = buffer.getNumSamples();
+
+    updateMeter(false, buffer, numSamples, isMono);
+    
 
     if (!mFloatBuffer)
     {
@@ -186,7 +187,7 @@ void SkeletonAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer
 
     mDoubleBuffer = mToneStack->Process(mTempDoubleBuffer, isMono, numSamples);
 
-    if (mIR != nullptr and mParameters.getParameterAsValue("irEnabled").getValue()) // TODO add param to trigger path
+    if (mIR != nullptr and mParameters.getParameterAsValue("irEnabled").getValue() and not mIsIRLoading) 
         mTempDoubleBuffer = mIR->Process(mDoubleBuffer, isMono, numSamples);
     else
     {
@@ -196,12 +197,13 @@ void SkeletonAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer
         }
     }
 
-    if (mIRVerb != nullptr and mParameters.getParameterAsValue("irVerbEnabled").getValue())
+    if (mIRVerb != nullptr and mParameters.getParameterAsValue("irVerbEnabled").getValue() and not mIsIRVerbLoading)
     {
         for (int channel = 0; channel < isMono; ++channel)
         {
             std::copy(mTempDoubleBuffer[channel], mTempDoubleBuffer[channel] + numSamples, mVerbDoubleBuffer[channel]);
         }
+
 
         mDoubleBuffer = mIRVerb->Process(mTempDoubleBuffer, isMono, numSamples);
         float mix = mParameters.getParameterAsValue("irVerbMix").getValue();
@@ -247,34 +249,17 @@ void SkeletonAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer
 
     buffer.applyGain(mParameters.getParameterAsValue("output").getValue());
 
-    for (int channel = 0; channel < numChannels; ++channel)
-    {
-        auto* channelData = buffer.getReadPointer(channel);
-        float sum = 0.0f;
-
-        for (int i = 0; i < numSamples; ++i)
-        {
-            sum += channelData[i] * channelData[i];
-        }
-
-        float rms = std::sqrt(sum / numSamples);
-
-        if (channel == 0)
-        {
-            mRmsOutputLevelLeft.store(rms);
-        }
-        if (channel == 1)
-        {
-            mRmsOutputLevelRight.store(rms);
-        }
-    }
+    updateMeter(true, buffer, numSamples, numChannels); 
 }
 
 void SkeletonAudioProcessor::loadImpulseResponse(const juce::File& inIRFile)
 {
+    mIsIRLoading = true;
+
     stageIR(inIRFile);
     if (mStagedIR != nullptr)
     {
+        mIsIRLoading = true;
         mIR = std::move(mStagedIR);
         mStagedIR = nullptr;
     }
@@ -282,15 +267,20 @@ void SkeletonAudioProcessor::loadImpulseResponse(const juce::File& inIRFile)
     {
         std::cerr << "Failed to load impulse response." << std::endl;
     }
+    mIsIRLoading = false;
+
 }
 
 void SkeletonAudioProcessor::loadImpulseResponseVerb(const juce::File& inIRFile)
 {
+    mIsIRVerbLoading = true;
+
     stageIRVerb(inIRFile);
     if (mStagedIRVerb != nullptr)
     {
         mIRVerb = std::move(mStagedIRVerb);
         mStagedIRVerb = nullptr;
+        mIsIRVerbLoading = false;
     }
     else
     {

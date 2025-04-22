@@ -22,6 +22,7 @@ public:
     void prepareToPlay(double, int) override {}
     void releaseResources() override {}
     void processBlock(AudioBuffer<float>& buffer, MidiBuffer&) override;
+    void updateMeter(bool isOutput, AudioBuffer<float>& buffer, int numSamples, int numChannels);
 
     //==============================================================================
     AudioProcessorEditor* createEditor() override {
@@ -170,9 +171,8 @@ public:
     }
 
     void setStateInformation(const void* data, int sizeInBytes) override
-    {
+    {}
 
-	}
     void initState()
     {
         mIRPath = createJucePathFromFile(mParameters.state.getProperty("irPath").toString());
@@ -216,9 +216,9 @@ private:
     juce::File mDirectIRPath;
     juce::File mDirectIRVerbPath;
 
-    bool mIsIRActive;
     bool mIsNAMEnabled;
-    bool mIsIRVerbEnabled;
+    bool mIsIRLoading;
+    bool mIsIRVerbLoading;
 
     float** mFloatBuffer = nullptr;
     float** mTempFloatBuffer = nullptr;
