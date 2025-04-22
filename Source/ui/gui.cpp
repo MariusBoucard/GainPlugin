@@ -1,6 +1,6 @@
 #include "gui.h"
 
-#include "../AmpAudioProcessor.h"
+#include "../dsp/Processor.h"
 #include <JuceHeader.h>
 int RootViewComponent::ROOT_WIDTH = 980;
 int RootViewComponent::ROOT_HEIGHT = 550;
@@ -22,11 +22,8 @@ RootViewComponent::RootViewComponent(juce::AudioProcessor& processor)
     if (mImage.isNull())
         DBG("Failed to load image from resources");
 
-
     setSize(ROOT_WIDTH,ROOT_HEIGHT);
-
     defineKnobLayout();
-
     configureNodes(gainProcessor);
 }
 
@@ -45,7 +42,7 @@ RootViewComponent::~RootViewComponent()
 
 void RootViewComponent::updatePath()
 {
-    AmpAudioProcessor* ampAudioProcessor = dynamic_cast<AmpAudioProcessor*>(&processor);
+    SkeletonAudioProcessor* ampAudioProcessor = dynamic_cast<SkeletonAudioProcessor*>(&processor);
 
     DirectoryIterator iter(ampAudioProcessor->getNAMPath(), false, "*", juce::File::findFiles);
     int itemId = 1;
@@ -154,7 +151,7 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
 {
     auto bounds = getLocalBounds();
 
-    AmpAudioProcessor* ampAudioProcessor = dynamic_cast<AmpAudioProcessor*>(&inProcessor);
+    SkeletonAudioProcessor* ampAudioProcessor = dynamic_cast<SkeletonAudioProcessor*>(&inProcessor);
     
     mInputKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mBassKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
@@ -299,21 +296,21 @@ void RootViewComponent::configureNodes(juce::AudioProcessor& inProcessor)
 void RootViewComponent::handleSelectedFile(const juce::File& file)
 {
     DBG("Handling file: " << file.getFullPathName());
-    AmpAudioProcessor& audioProcessor = static_cast<AmpAudioProcessor&>(processor);
+    SkeletonAudioProcessor& audioProcessor = static_cast<SkeletonAudioProcessor&>(processor);
     audioProcessor.loadImpulseResponse(file);
 }
 
 void RootViewComponent::handleSelectedNAMFile(const juce::File& file)
 {
 	DBG("Handling NAM file: " << file.getFullPathName());
-	AmpAudioProcessor& audioProcessor = static_cast<AmpAudioProcessor&>(processor);
+    SkeletonAudioProcessor& audioProcessor = static_cast<SkeletonAudioProcessor&>(processor);
 	audioProcessor.loadNAMFile(file);
 }
 
 void RootViewComponent::handleSelectedVerbIRFile(const juce::File& file)
 {
 	DBG("Handling NAM file: " << file.getFullPathName());
-	AmpAudioProcessor& audioProcessor = static_cast<AmpAudioProcessor&>(processor);
+    SkeletonAudioProcessor& audioProcessor = static_cast<SkeletonAudioProcessor&>(processor);
 	audioProcessor.loadImpulseResponseVerb(file);
 }
 
@@ -345,8 +342,7 @@ void RootViewComponent::resized()
 
 void RootViewComponent::MeterComponent::paint(juce::Graphics& g)
 {
-
-    AmpAudioProcessor& meter = static_cast<AmpAudioProcessor&>(audioProcessor);
+    SkeletonAudioProcessor& meter = static_cast<SkeletonAudioProcessor&>(audioProcessor);
     float rmsLeft = 0.0f;
     float rmsRight = 0.0f;
 
@@ -369,22 +365,18 @@ void RootViewComponent::MeterComponent::paint(juce::Graphics& g)
     g.setColour(juce::Colours::darkgrey.withAlpha(0.8f)); 
     g.fillRoundedRectangle(meterBounds, 5.0f); 
 
-    // Draw the left meter bar with a gradient
     juce::Rectangle<float> leftMeterBounds(10, getHeight() - (rmsLeft * getHeight()), getWidth() / 2 - 15, rmsLeft * getHeight());
     juce::ColourGradient leftGradient(juce::Colours::green, leftMeterBounds.getBottomLeft(),
         juce::Colours::limegreen, leftMeterBounds.getTopLeft(), false);
     g.setGradientFill(leftGradient);
     g.fillRoundedRectangle(leftMeterBounds, 3.0f); 
 
-    // used rmsLeft as well as no rigth yet
-
     juce::Rectangle<float> rightMeterBounds(getWidth() / 2 + 5, getHeight() - (rmsLeft * getHeight()), getWidth() / 2 - 15, rmsLeft * getHeight());
     juce::ColourGradient rightGradient(juce::Colours::green, rightMeterBounds.getBottomLeft(),
         juce::Colours::limegreen, rightMeterBounds.getTopLeft(), false);
     g.setGradientFill(rightGradient);
-    g.fillRoundedRectangle(rightMeterBounds, 3.0f); // Rounded corners for the bar
+    g.fillRoundedRectangle(rightMeterBounds, 3.0f); 
 
-    // Add a border around the meter
     g.setColour(juce::Colours::black.withAlpha(0.5f));
     g.drawRoundedRectangle(meterBounds, 5.0f, 1.0f);
 }

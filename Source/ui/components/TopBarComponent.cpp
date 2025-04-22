@@ -1,5 +1,7 @@
 #include "TopBarComponent.h"
-#include "../../AmpAudioProcessor.h"
+#include "../../dsp/processor.h"
+#include "../gui.h"
+
 void TopBarComponent::paint(juce::Graphics& g)
 {
     g.setColour(juce::Colours::darkgrey.withAlpha(0.5f));
@@ -30,7 +32,7 @@ TopBarComponent::SettingsModal::SettingsModal(AudioProcessor& inProcessor)
 {
     setLookAndFeel(&mLookAndFeel);
 
-    AmpAudioProcessor& processor = dynamic_cast<AmpAudioProcessor&>(mProcessor);
+    SkeletonAudioProcessor& processor = dynamic_cast<SkeletonAudioProcessor&>(mProcessor);
 
     addAndMakeVisible(mTitleLabel);
     mTitleLabel.setText("Amplifier Settings", juce::dontSendNotification); 
@@ -108,7 +110,7 @@ void TopBarComponent::SettingsModal::handleSelectedDirectory(const juce::File& d
 {
         if (directory.exists() && directory.isDirectory())
 	        {
-                AmpAudioProcessor * processor = dynamic_cast<AmpAudioProcessor*>(&mProcessor);
+            SkeletonAudioProcessor* processor = dynamic_cast<SkeletonAudioProcessor*>(&mProcessor);
             if (processor == nullptr)
             {
 	            DBG("Failed to cast inProcessor to AmpAudioProcessor.");

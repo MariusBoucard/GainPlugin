@@ -1,7 +1,7 @@
 
 
 
-void defineKnobLayout()
+void RootViewComponent::defineKnobLayout()
 {
     mTopBarLayout.inLayout.x = 0;
     mTopBarLayout.inLayout.y = 0;
