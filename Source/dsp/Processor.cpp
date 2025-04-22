@@ -187,7 +187,7 @@ void SkeletonAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer
 
     mDoubleBuffer = mToneStack->Process(mTempDoubleBuffer, isMono, numSamples);
 
-    if (mIR != nullptr and mParameters.getParameterAsValue("irEnabled").getValue() and not mIsIRLoading) 
+    if (mIR != nullptr and mParameters.getParameterAsValue("irEnabled").getValue() and ! mIsIRLoading) 
         mTempDoubleBuffer = mIR->Process(mDoubleBuffer, isMono, numSamples);
     else
     {
@@ -197,7 +197,7 @@ void SkeletonAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer
         }
     }
 
-    if (mIRVerb != nullptr and mParameters.getParameterAsValue("irVerbEnabled").getValue() and not mIsIRVerbLoading)
+    if (mIRVerb != nullptr and mParameters.getParameterAsValue("irVerbEnabled").getValue() and ! mIsIRVerbLoading)
     {
         for (int channel = 0; channel < isMono; ++channel)
         {
