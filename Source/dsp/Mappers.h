@@ -34,4 +34,15 @@ public :
 		recursive_linear_filter::BiquadParams trebleParams(sampleRate, trebleFrequency, trebleQuality, trebleGainDB);
 		inHighSetup = trebleParams;
 	}
+	static void setNoiseGateParams(dsp::noise_gate::TriggerParams& inTriggerParams, const double val)
+	{
+		const double time = 0.01;
+		const double threshold = val * (-160);
+		const double ratio = 0.1;
+		const double openTime = 0.005;
+		const double holdTime = 0.01;
+		const double closeTime = 0.05;
+		const dsp::noise_gate::TriggerParams triggerParams(time, threshold, ratio, openTime, holdTime, closeTime);
+	}
+
 };

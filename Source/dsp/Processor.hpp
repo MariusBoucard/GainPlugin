@@ -27,16 +27,9 @@ public:
         }
         else if (parameterID == "gate")
         {
-            const double time = 0.01;
-            const double threshold = newValue * (-160); // TODO Link param
-            const double ratio = 0.1; // Quadratic...
-            const double openTime = 0.005;
-            const double holdTime = 0.01;
-            const double closeTime = 0.05;
-            // TO MOVE TO MAPPERS
-            const dsp::noise_gate::TriggerParams triggerParams(time, threshold, ratio, openTime, holdTime, closeTime);
-            mNoiseGateTrigger->SetParams(triggerParams);
-            mNoiseGateTrigger->SetSampleRate(44100);
+            Mappers::setNoiseGateParams(mParameterSetup.mNoiseGateParams, newValue);
+            mNoiseGateTrigger->SetParams(mParameterSetup.mNoiseGateParams);
+            mNoiseGateTrigger->SetSampleRate(44100); // TODO
         }
     }
 private:
