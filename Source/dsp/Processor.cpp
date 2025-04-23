@@ -27,16 +27,17 @@ juce::File SkeletonAudioProcessor::createJucePathFromFile(const juce::String& fi
     return file;
 }
 
-SkeletonAudioProcessor::SkeletonAudioProcessor(juce::AudioProcessorValueTreeState& inParameters)
+SkeletonAudioProcessor::SkeletonAudioProcessor(juce::AudioProcessorValueTreeState& inParameters, ParameterSetup& inParameterSetup)
     : AudioProcessor(BusesProperties().withInput("Input", AudioChannelSet::mono())
         .withOutput("Output", AudioChannelSet::stereo()))
     , mParameters(inParameters)
+    , mParameterSetup(inParameterSetup)
     , mBlockSize(256)
     , mSampleRate(44100)
-    , mToneStack(new dsp::tone_stack::BasicNamToneStack())
+    , mToneStack(new dsp::tone_stack::BasicNamToneStack(mParameterSetup))
     , mNoiseGateTrigger(new dsp::noise_gate::Trigger())
     , mNoiseGateGain(new dsp::noise_gate::Gain())
-    , mParamListener(mToneStack, mNoiseGateGain, mNoiseGateTrigger)
+    , mParamListener(mToneStack, mNoiseGateGain, mNoiseGateTrigger, mParameterSetup)
     , mIsNAMEnabled(true)
     , mIRPath()
     , mIRVerbPath()

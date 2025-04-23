@@ -36,13 +36,13 @@
 #include "dsp/ImpulseResponse.h"
 #include "NAM/get_dsp.h"
 #include "dsp/Processor.h"
+#include "dsp/ParameterSetup.h"
 
 class AmpAudioProcessor final : public AudioProcessor
 {
 public:
 
     AmpAudioProcessor();
-
     ~AmpAudioProcessor() override;
 
     juce::AudioProcessorValueTreeState::ParameterLayout AmpAudioProcessor::createParameterLayout()
@@ -130,6 +130,7 @@ public:
 private:
     juce::AudioProcessorValueTreeState mParameters; 
     SkeletonAudioProcessor mSkeletonAmpProcessor; 
+    ParameterSetup mParameterSetup;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmpAudioProcessor)
 };

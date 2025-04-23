@@ -111,6 +111,7 @@ jucer_project_files("GainPlugin/Source/dsp"
  x        .         .          "Source/dsp/Mappers.h"
  x     .         .          "Source/dsp/Processor.cpp"
   x        .         .          "Source/dsp/Processor.h"
+  x        .         .          "Source/dsp/ParameterSetup.h"
 
 )
 
@@ -121,8 +122,6 @@ jucer_project_files("GainPlugin/Source/dsp/Bones"
   .         .         .         "Source/dsp/Bones/ToneStack.h"
   x         .         .         "Source/dsp/Bones/ResamplingNAM.cpp"
   .         .         .         "Source/dsp/Bones/ResamplingNAM.h"
-
-
 )
 
 jucer_project_files("GainPlugin/Source"

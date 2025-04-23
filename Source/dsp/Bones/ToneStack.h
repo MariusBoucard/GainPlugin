@@ -3,7 +3,7 @@
 #include <string>
 #include "dsp/dsp.h"
 #include "dsp/RecursiveLinearFilter.h"
-
+#include "../ParameterSetup.h"
 namespace dsp
 {
 namespace tone_stack
@@ -11,16 +11,13 @@ namespace tone_stack
 class AbstractToneStack
 {
 public:
-  // Compute in the real-time loop
-  virtual DSP_SAMPLE** Process(DSP_SAMPLE** inputs, const int numChannels, const int numFrames) = 0;
-  // Any preparation. Call from Reset() in the plugin
+
+    virtual DSP_SAMPLE** Process(DSP_SAMPLE** inputs, const int numChannels, const int numFrames) = 0;
   virtual void Reset(const double sampleRate, const int maxBlockSize)
   {
     mSampleRate = sampleRate;
     mMaxBlockSize = maxBlockSize;
   };
-  // Set the various parameters of your tone stack by name.
-  // Call this during OnParamChange()
   virtual void SetParam(const std::string name, const double val) = 0;
 
 protected:
@@ -32,12 +29,15 @@ protected:
 class BasicNamToneStack : public AbstractToneStack
 {
 public:
-  BasicNamToneStack()
-  {
-    SetParam("bass", 0.5);
-    SetParam("middle", 0.5);
-    SetParam("high", 0.5);
+    BasicNamToneStack(ParameterSetup& inParameterSetup)
+        : mParameterSetup(inParameterSetup)
+        , mBassVal(0.5)
+        , mMiddleVal(0.5)
+        , mTrebleVal(0.5)
+    {
+
   };
+
   ~BasicNamToneStack() = default;
 
   DSP_SAMPLE** Process(DSP_SAMPLE** inputs, const int numChannels, const int numFrames);
@@ -51,10 +51,10 @@ protected:
   recursive_linear_filter::Peaking mToneMid;
   recursive_linear_filter::HighShelf mToneTreble;
 
-  // HACK not DRY w knob defs
-  double mBassVal = 0.5;
-  double mMiddleVal = 0.5;
-  double mTrebleVal = 0.5;
+  ParameterSetup& mParameterSetup;
+  double mBassVal ;
+  double mMiddleVal;
+  double mTrebleVal;
 };
 }; // namespace tone_stack
 }; // namespace dsp

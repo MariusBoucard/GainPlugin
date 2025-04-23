@@ -5,6 +5,8 @@
 #include "dsp/NoiseGate.h"
 #include "dsp/ImpulseResponse.h"
 #include "NAM/get_dsp.h"
+#include "ParameterSetup.h"
+#include "Mappers.h"
 
 //==============================================================================
 class SkeletonAudioProcessor final : public AudioProcessor
@@ -12,7 +14,7 @@ class SkeletonAudioProcessor final : public AudioProcessor
 public:
 
     //==============================================================================
-    SkeletonAudioProcessor(juce::AudioProcessorValueTreeState& inParameters);
+    SkeletonAudioProcessor(juce::AudioProcessorValueTreeState& inParameters, ParameterSetup& inParameterSetup);
 
 
     ~SkeletonAudioProcessor() override;
@@ -53,23 +55,28 @@ public:
     class ParamListener : public juce::AudioProcessorValueTreeState::Listener
     {
     public:
-        ParamListener(dsp::tone_stack::AbstractToneStack* toneStack, dsp::noise_gate::Gain* inGain, dsp::noise_gate::Trigger* inNoiseGateTrigger)
+        ParamListener(dsp::tone_stack::AbstractToneStack* toneStack, dsp::noise_gate::Gain* inGain, dsp::noise_gate::Trigger* inNoiseGateTrigger,ParameterSetup& inParameterSetup)
             : mToneStack(toneStack)
             , mNoiseGateGain(inGain)
-            , mNoiseGateTrigger(inNoiseGateTrigger) {}
+            , mNoiseGateTrigger(inNoiseGateTrigger)
+            , mParameterSetup(inParameterSetup)
+        {}
 
         void parameterChanged(const juce::String& parameterID, float newValue) override
         {
             if (parameterID == "bass")
             {
+                Mappers::setToneStackBass(mParameterSetup.mBassParams, newValue);
                 mToneStack->SetParam("bass", newValue);
             }
             else if (parameterID == "mid")
             {
+                Mappers::setToneStackMid(mParameterSetup.mMidParams, newValue);
                 mToneStack->SetParam("middle", newValue);
             }
             else if (parameterID == "high")
             {
+                Mappers::setToneStackHigh(mParameterSetup.mHighParams, newValue);
                 mToneStack->SetParam("high", newValue);
             }
             else if (parameterID == "gate")
@@ -90,6 +97,7 @@ public:
         dsp::tone_stack::AbstractToneStack* mToneStack; 
         dsp::noise_gate::Gain* mNoiseGateGain; 
         dsp::noise_gate::Trigger* mNoiseGateTrigger; 
+        ParameterSetup& mParameterSetup;
     };
     // TO MOVE TO METERING 
     double getRmsLevelLeft() const { return mRmsLevelLeft.load(); }
@@ -198,6 +206,7 @@ private:
     //==============================================================================
     AudioParameterFloat* gain;
     juce::AudioProcessorValueTreeState& mParameters;
+    ParameterSetup& mParameterSetup;
     std::unique_ptr<nam::DSP> mModel;
     dsp::tone_stack::AbstractToneStack* mToneStack;
     dsp::noise_gate::Gain* mNoiseGateGain;

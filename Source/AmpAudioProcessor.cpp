@@ -31,7 +31,8 @@ AmpAudioProcessor::AmpAudioProcessor()
     : AudioProcessor(BusesProperties().withInput("Input", AudioChannelSet::mono())
     . withOutput("Output", AudioChannelSet::stereo()))
     , mParameters(*this, nullptr, "PARAMETERS", createParameterLayout())
-    , mSkeletonAmpProcessor(mParameters)
+    , mParameterSetup()
+    , mSkeletonAmpProcessor(mParameters,mParameterSetup)
 {
 
 }
