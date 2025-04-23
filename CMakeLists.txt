@@ -112,6 +112,7 @@ jucer_project_files("GainPlugin/Source/dsp"
  x     .         .          "Source/dsp/Processor.cpp"
   x        .         .          "Source/dsp/Processor.h"
   x        .         .          "Source/dsp/ParameterSetup.h"
+  x        .         .          "Source/dsp/Processor.hpp"
 
 )
 
@@ -130,6 +131,7 @@ jucer_project_files("GainPlugin/Source"
   x         .         .         "Source/Main.cpp"
   x         .         .         "Source/AmpAudioProcessor.cpp"
   .         .         .         "Source/AmpAudioProcessor.h"
+  .         .         .         "Source/AmpAudioProcessor.hpp"
 )
 
 jucer_project_module(
