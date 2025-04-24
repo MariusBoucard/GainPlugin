@@ -134,6 +134,69 @@ public:
     void setStateInformation(const void* data, int sizeInBytes) override
     {}
 
+    juce::File createTemporaryFileFromMemory(const void* binaryData, size_t dataSize, const juce::String& fileName)
+    {
+        juce::File tempFile = juce::File::getSpecialLocation(juce::File::tempDirectory).getChildFile(fileName);
+
+        tempFile.deleteFile();
+        tempFile.create();    
+
+        juce::FileOutputStream outputStream(tempFile);
+        if (outputStream.openedOk())
+        {
+            outputStream.write(binaryData, dataSize);
+            outputStream.flush();
+        }
+        else
+        {
+            DBG("Failed to create temporary file.");
+        }
+
+        return tempFile;
+    }
+
+    void loadDefaultIRFile()
+	{
+        juce::File tempFile = createTemporaryFileFromMemory(BinaryData::HolyGrail_wav, BinaryData::HolyGrail_wavSize, "holygrail.wav");
+
+        if (tempFile.existsAsFile())
+        {
+            loadImpulseResponse(tempFile);
+        }
+        else
+        {
+            DBG("Failed to create temporary file for impulse response.");
+        }
+	}
+    void loadDefaultIRVerb()
+    {
+        juce::File tempFile = createTemporaryFileFromMemory(BinaryData::room_wav, BinaryData::room_wavSize, "room.wav");
+
+        if (tempFile.existsAsFile())
+        {
+            loadImpulseResponseVerb(tempFile);
+        }
+        else
+        {
+            DBG("Failed to create temporary file for impulse response.");
+        }
+}
+    void loadDefaultNAMFile()
+    {
+        juce::File tempFile = createTemporaryFileFromMemory(BinaryData::MetalLead_nam, BinaryData::MetalLead_namSize, "metal.nam");
+
+        if (tempFile.existsAsFile())
+        {
+            loadNAMFile(tempFile);
+        }
+        else
+        {
+            DBG("Failed to create temporary file for impulse response.");
+        }
+
+    }
+
+
     void initState()
     {
         mIRPath = createJucePathFromFile(mParameters.state.getProperty("irPath").toString());
@@ -144,9 +207,10 @@ public:
         mDirectIRPath = createJucePathFromFile(mParameters.state.getProperty("directIRPath").toString());
         mDirectIRVerbPath = createJucePathFromFile(mParameters.state.getProperty("directIRVerbPath").toString());
 
-        loadNAMFile(mDirectNAMPath);
-        loadImpulseResponse(mDirectIRPath);
-        loadImpulseResponseVerb(mDirectIRVerbPath);
+        mDirectIRPath.existsAsFile() ? loadImpulseResponse(mDirectNAMPath) : loadDefaultIRFile();
+        mDirectIRVerbPath.existsAsFile() ? loadImpulseResponseVerb(mDirectIRVerbPath) : loadDefaultIRVerb();
+        mDirectNAMPath.existsAsFile() ? loadNAMFile(mDirectNAMPath) : loadDefaultNAMFile();
+        
     }
 
     void getStateInformation(MemoryBlock& destData) override

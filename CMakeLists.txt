@@ -87,6 +87,13 @@ jucer_project_files("GainPlugin/ressources"
   .         x         x         "Source/ressources/plate.png"
   .         x         x         "Source/ressources/toggleButtonStrip.png"
 )
+jucer_project_files("GainPlugin/ressource/defaultModels"
+# Compile   Xcode     Binary    File
+#           Resource  Resource
+  .         x         x         "Source/ressources/defaultModels/HolyGrail.wav"
+  .         x         x         "Source/ressources/defaultModels/room.wav"
+  .         x         x         "Source/ressources/defaultModels/MetalLead.nam"
+)
 
 jucer_project_files("GainPlugin/Source/ui"
 # Compile   Xcode     Binary    File
