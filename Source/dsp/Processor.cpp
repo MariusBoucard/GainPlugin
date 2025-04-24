@@ -37,7 +37,7 @@ SkeletonAudioProcessor::SkeletonAudioProcessor(juce::AudioProcessorValueTreeStat
     , mToneStack(new dsp::tone_stack::BasicNamToneStack(mParameterSetup))
     , mNoiseGateTrigger(new dsp::noise_gate::Trigger())
     , mNoiseGateGain(new dsp::noise_gate::Gain())
-    , mParamListener(mToneStack, mNoiseGateGain, mNoiseGateTrigger, mParameterSetup)
+    , mParamListener(*this,mToneStack, mNoiseGateGain, mNoiseGateTrigger, mParameterSetup)
     , mIsNAMEnabled(true)
     , mIRPath()
     , mIRVerbPath()

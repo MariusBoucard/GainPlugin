@@ -22,7 +22,13 @@ public:
 
     juce::File createJucePathFromFile(const juce::String& filePath);
 
-    void prepareToPlay(double, int) override {}
+    void prepareToPlay(double, int) override
+    {
+        mSampleRate = getSampleRate();
+		mBlockSize = getBlockSize();
+        mModel->ResetAndPrewarm(mSampleRate, mBlockSize);
+        Mappers::getMapperInstance().setSampleRate(mSampleRate);
+    }
     void releaseResources() override {}
     void processBlock(AudioBuffer<float>& buffer, MidiBuffer&) override;
     void updateMeter(bool isOutput, AudioBuffer<float>& buffer, int numSamples, int numChannels);
