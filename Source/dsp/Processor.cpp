@@ -184,11 +184,8 @@ void SkeletonAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer
     }
 
     
-    //EmTempDoubleBuffer = mNoiseGateGain->Process(mDoubleBuffer, isMono, numSamples);
-    for (int channel = 0; channel < isMono; ++channel)
-    {
-        std::copy(mDoubleBuffer[channel], mDoubleBuffer[channel] + numSamples, mTempDoubleBuffer[channel]);
-    }
+    mTempDoubleBuffer = mNoiseGateGain->Process(mDoubleBuffer, isMono, numSamples);
+
 
 
     mDoubleBuffer = mToneStack->Process(mTempDoubleBuffer, isMono, numSamples);

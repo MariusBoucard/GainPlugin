@@ -59,6 +59,7 @@ public:
 		const double holdTime = 0.01;
 		const double closeTime = 0.05;
 		const dsp::noise_gate::TriggerParams triggerParams(time, threshold, ratio, openTime, holdTime, closeTime);
+		inTriggerParams = triggerParams;
 	}
 
 private:
