@@ -86,7 +86,7 @@ SkeletonAudioProcessor::~SkeletonAudioProcessor()
     }
     delete[] mFloatBuffer;
     delete[] mTempFloatBuffer;
-}
+}  
 void SkeletonAudioProcessor::updateMeter(bool isOutput, AudioBuffer<float>& buffer,int numSamples,int numChannels)
 {
     for (int channel = 0; channel < numChannels; ++channel)
@@ -183,7 +183,12 @@ void SkeletonAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer
         }
     }
 
-    mTempDoubleBuffer = mNoiseGateGain->Process(mDoubleBuffer, isMono, numSamples);
+    
+    //EmTempDoubleBuffer = mNoiseGateGain->Process(mDoubleBuffer, isMono, numSamples);
+    for (int channel = 0; channel < isMono; ++channel)
+    {
+        std::copy(mDoubleBuffer[channel], mDoubleBuffer[channel] + numSamples, mTempDoubleBuffer[channel]);
+    }
 
 
     mDoubleBuffer = mToneStack->Process(mTempDoubleBuffer, isMono, numSamples);
