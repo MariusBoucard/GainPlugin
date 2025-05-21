@@ -306,10 +306,22 @@ jucer_project_end()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-add_subdirectory("Library/NeuralAmpModelerCore")
 target_link_libraries(GainPlugin_Shared_Code PUBLIC NAM)
 
-add_subdirectory("Library/AudioDSPTools")
-
-
+if(MSVC)
+    set_target_properties(GainPlugin_Shared_Code PROPERTIES VS_GLOBAL_UseIntelIPP "Sequential") # Parallel_Static
+endif(MSVC)
+target_link_libraries(GainPlugin_Shared_Code PUBLIC
+        juce::juce_recommended_config_flags
+        juce::juce_recommended_lto_flags
+        juce::juce_recommended_warning_flags)
+#target_link_libraries(GainPlugin_Shared_Code PUBLIC ipp)
 target_link_libraries(GainPlugin_Shared_Code PUBLIC AudioDSPTools)
+
+
+target_compile_options(
+        GainPlugin_Shared_Code PRIVATE
+        /W3 /nologo /EHsc
+        "$<$<CONFIG:Debug>:/MTd;/Od;/Ob0;/Zi;/RTC1;/DDEBUG;/D_DEBUG>"
+        "$<$<CONFIG:Release>:/O2;/Ob2;/Gy;/GR;/DNDEBUG>"
+)

@@ -38,6 +38,10 @@ RootViewComponent::~RootViewComponent()
 	mVerbMixKnob.setLookAndFeel(nullptr);
 	mFileChooserButton.setLookAndFeel(nullptr);
 	mNAMChooserButton.setLookAndFeel(nullptr);
+    mIRButton.setLookAndFeel(nullptr);
+    mNAMButton.setLookAndFeel(nullptr);
+    mIRVerbButton.setLookAndFeel(nullptr);
+    mVerbDropDown.setLookAndFeel(nullptr);
 }
 
 void RootViewComponent::setSliderAttachement(AudioProcessor& inProcessoe)

@@ -37,7 +37,6 @@
 #include "NAM/get_dsp.h"
 #include "dsp/Processor.h"
 #include "dsp/ParameterSetup.h"
-
 class AmpAudioProcessor final : public AudioProcessor
 {
 public:
