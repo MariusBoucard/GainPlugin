@@ -19,7 +19,7 @@ set(GainPlugin_jucer_FILE
 )
 
 
-set(JUCE_MODULES_GLOBAL_PATH "C:/Users/Marius/Desktop/JUCE/modules")
+set(JUCE_MODULES_GLOBAL_PATH "C:/Users/Marius/Documents/JUCE - Copie/modules")
 
 
 jucer_project_begin(
@@ -42,7 +42,7 @@ jucer_project_settings(
   PREPROCESSOR_DEFINITIONS
     "PIP_JUCE_EXAMPLES_DIRECTORY=QzpcVXNlcnNcTWFyaXVzXERlc2t0b3BcSlVDRVxleGFtcGxlcw=="
   HEADER_SEARCH_PATHS
-    "C:\\Users\\Marius\\Desktop\\JUCE\\projects\\GainPlugin\\Library\\NeuralAmpModelerCore"
+    "C:\\Users\\Marius\\Documents\\JUCE - Copie\\libraries\\NeuralAmpModelerCore"
   # NOTES
   #   Gain audio plugin.
 )
@@ -306,22 +306,27 @@ jucer_project_end()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+#add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/../../libraries/NeuralAmpModelerCore" "${CMAKE_BINARY_DIR}/NeuralAmpModelerCore")
+#add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/../../libraries/AudioDSPTools" "${CMAKE_BINARY_DIR}/AudioDSPTools")
+add_definitions(-DJUCE_MODAL_LOOPS_PERMITTED=1)
+
 target_link_libraries(GainPlugin_Shared_Code PUBLIC NAM)
 
 if(MSVC)
-    set_target_properties(GainPlugin_Shared_Code PROPERTIES VS_GLOBAL_UseIntelIPP "Sequential") # Parallel_Static
+ #   set_target_properties(GainPlugin_Shared_Code PROPERTIES VS_GLOBAL_UseIntelIPP "Sequential") # Parallel_Static
 endif(MSVC)
-target_link_libraries(GainPlugin_Shared_Code PUBLIC
-        juce::juce_recommended_config_flags
-        juce::juce_recommended_lto_flags
-        juce::juce_recommended_warning_flags)
+#target_link_libraries(GainPlugin_Shared_Code PUBLIC
+#        juce::juce_recommended_config_flags
+#        juce::juce_recommended_lto_flags
+#        juce::juce_recommended_warning_flags)
 #target_link_libraries(GainPlugin_Shared_Code PUBLIC ipp)
 target_link_libraries(GainPlugin_Shared_Code PUBLIC AudioDSPTools)
 
-
-target_compile_options(
-        GainPlugin_Shared_Code PRIVATE
-        /W3 /nologo /EHsc
-        "$<$<CONFIG:Debug>:/MTd;/Od;/Ob0;/Zi;/RTC1;/DDEBUG;/D_DEBUG>"
-        "$<$<CONFIG:Release>:/O2;/Ob2;/Gy;/GR;/DNDEBUG>"
-)
+#
+#target_compile_options(
+#        GainPlugin_Shared_Code PRIVATE
+#        /W3 /nologo /EHsc
+#        "$<$<CONFIG:Debug>:/O2;/Zo;/Zi;/DDEBUG>"    # Debug avec optimisations
+#        "$<$<CONFIG:Release>:/O2;/Ob2;/Gy;/GR;>"
+#        #         "$<$<CONFIG:Release>:/O2;/Ob2;/GT;/GL;/GR-;/DNDEBUG>" # perhaps even better
+#)
