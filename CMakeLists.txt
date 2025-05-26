@@ -322,6 +322,11 @@ endif(MSVC)
 #target_link_libraries(GainPlugin_Shared_Code PUBLIC ipp)
 target_link_libraries(GainPlugin_Shared_Code PUBLIC AudioDSPTools)
 
+add_custom_command(TARGET GainPlugin_VST3 POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE:GainPlugin_VST3>"
+        "D:\\vstcreation\\$<TARGET_FILE_NAME:GainPlugin_VST3>"
+)
 #
 #target_compile_options(
 #        GainPlugin_Shared_Code PRIVATE
