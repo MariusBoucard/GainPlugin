@@ -170,7 +170,6 @@ void SkeletonAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer
 
             for (int channel = 0; channel < isMono; ++channel)
             {
-
                 mModel->process(mTempDoubleBuffer[channel] + startSample, mDoubleBuffer[channel] + startSample, blockSize);
             }
         }

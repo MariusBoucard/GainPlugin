@@ -9,9 +9,10 @@ if (MSVC)
 endif()
 
 
-
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../builder")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../FRUT/prefix/FRUT/cmake")
 include(Reprojucer)
+include(projectTemplate)
 
 
 set(GainPlugin_jucer_FILE
@@ -19,56 +20,31 @@ set(GainPlugin_jucer_FILE
 )
 
 
-set(JUCE_MODULES_GLOBAL_PATH "C:/Users/Marius/Documents/JUCE - Copie/modules")
+set(JUCE_MODULES_GLOBAL_PATH "C:/Users/Marius/Documents/JUCE/modules")
+
+set(GAINPLUGIN_JUCER_FILE "${CMAKE_CURRENT_LIST_DIR}/GainPlugin.jucer")
+set(GAINPLUGIN_ID "ehvdlS")
+set(GAINPLUGIN_VERSION "1.0.0")
+set(GAINPLUGIN_COMPANY_NAME "BALL")
+set(GAINPLUGIN_COMPANY_WEBSITE "http://juce.com")
+set(GAINPLUGIN_PREPROCESSOR_DEFS "PIP_JUCE_EXAMPLES_DIRECTORY=QzpcVXNlcnNcTWFyaXVzXERlc2t0b3BcSlVDRVxleGFtcGxlcw==")
+set(GAINPLUGIN_HEADER_SEARCH_PATHS "C:/Users/Marius/Documents/JUCE/libraries/NeuralAmpModelerCore")
+set(GAINPLUGIN_FORMATS "VST3;Standalone")
+set(GAINPLUGIN_SPECIFIC_NAME "Ballzzy's amp")
+set(COMMON_JUCE_MODULES_PATH "C:/Users/Marius/Documents/JUCE/modules")
 
 
-jucer_project_begin(
-  JUCER_FORMAT_VERSION "1"
-  PROJECT_FILE "${GainPlugin_jucer_FILE}"
-  PROJECT_ID "ehvdlS"
-)
-
-jucer_project_settings(
-  PROJECT_NAME "GainPlugin"
-  PROJECT_VERSION "1.0.0"
-  COMPANY_NAME "JUCE"
-  COMPANY_WEBSITE "http://juce.com"
-  USE_GLOBAL_APPCONFIG_HEADER OFF
-  ADD_USING_NAMESPACE_JUCE_TO_JUCE_HEADER ON
-  DISPLAY_THE_JUCE_SPLASH_SCREEN ON # Required for closed source applications without an Indie or Pro JUCE license
-  PROJECT_TYPE "Audio Plug-in"
-  BUNDLE_IDENTIFIER "com.JUCE.GainPlugin"
-  CXX_LANGUAGE_STANDARD "C++17"
-  PREPROCESSOR_DEFINITIONS
-    "PIP_JUCE_EXAMPLES_DIRECTORY=QzpcVXNlcnNcTWFyaXVzXERlc2t0b3BcSlVDRVxleGFtcGxlcw=="
-  HEADER_SEARCH_PATHS
-    "C:\\Users\\Marius\\Documents\\JUCE - Copie\\libraries\\NeuralAmpModelerCore"
-  # NOTES
-  #   Gain audio plugin.
-)
-
-jucer_audio_plugin_settings(
-  PLUGIN_FORMATS
-    "VST3"
-    "Standalone"
-  # PLUGIN_CHARACTERISTICS
-  PLUGIN_NAME "Ballzzy's amp"
-  PLUGIN_DESCRIPTION "Amp made by ballzzy"
-  PLUGIN_MANUFACTURER "JUCE"
-  PLUGIN_MANUFACTURER_CODE "Manu"
-  PLUGIN_CODE "Ehvd"
-  # PLUGIN_CHANNEL_CONFIGURATIONS
-  PLUGIN_AAX_IDENTIFIER "com.JUCE.GainPlugin"
-  PLUGIN_AU_EXPORT_PREFIX "GainPluginAU"
-  PLUGIN_AU_MAIN_TYPE "kAudioUnitType_Effect"
-  PLUGIN_AU_IS_SANDBOX_SAFE ON
-  PLUGIN_VST3_CATEGORY
-    "Fx"
-  PLUGIN_RTAS_CATEGORY
-    "ePlugInCategory_None"
-  PLUGIN_AAX_CATEGORY
-    "AAX_ePlugInCategory_None"
-  PLUGIN_VST_LEGACY_CATEGORY "kPlugCategEffect"
+jucer_setup_project_header(
+        "${GAINPLUGIN_JUCER_FILE}"
+        "${GAINPLUGIN_ID}"
+        "GainPlugin"
+        "${GAINPLUGIN_VERSION}"
+        "${GAINPLUGIN_COMPANY_NAME}"
+        "${GAINPLUGIN_COMPANY_WEBSITE}"
+        "${GAINPLUGIN_PREPROCESSOR_DEFS}"
+        "${GAINPLUGIN_HEADER_SEARCH_PATHS}"
+        "${GAINPLUGIN_FORMATS}"
+        "${GAINPLUGIN_SPECIFIC_NAME}"
 )
 
 jucer_project_files("GainPlugin/looknfeel"
@@ -140,186 +116,19 @@ jucer_project_files("GainPlugin/Source"
   .         .         .         "Source/AmpAudioProcessor.h"
   .         .         .         "Source/AmpAudioProcessor.hpp"
 )
-
-jucer_project_module(
-  juce_audio_basics
-  PATH "${JUCE_MODULES_GLOBAL_PATH}"
+jucer_setup_project_footer(
+        "GainPlugin" # Nom du projet CMake
+        "${COMMON_JUCE_MODULES_PATH}"
 )
-
-jucer_project_module(
-  juce_audio_devices
-  PATH "${JUCE_MODULES_GLOBAL_PATH}"
-  # JUCE_USE_WINRT_MIDI
-  # JUCE_ASIO
-  # JUCE_WASAPI
-  # JUCE_DIRECTSOUND
-  # JUCE_ALSA
-  # JUCE_JACK
-  # JUCE_BELA
-  # JUCE_USE_ANDROID_OBOE
-  # JUCE_USE_OBOE_STABILIZED_CALLBACK
-  # JUCE_USE_ANDROID_OPENSLES
-  # JUCE_DISABLE_AUDIO_MIXING_WITH_OTHER_APPS
-)
-
-jucer_project_module(
-  juce_audio_formats
-  PATH "${JUCE_MODULES_GLOBAL_PATH}"
-  # JUCE_USE_FLAC
-  # JUCE_USE_OGGVORBIS
-  # JUCE_USE_MP3AUDIOFORMAT
-  # JUCE_USE_LAME_AUDIO_FORMAT
-  # JUCE_USE_WINDOWS_MEDIA_FORMAT
-)
-
-jucer_project_module(
-  juce_audio_plugin_client
-  PATH "${JUCE_MODULES_GLOBAL_PATH}"
-  JUCE_VST3_CAN_REPLACE_VST2 OFF
-  # JUCE_FORCE_USE_LEGACY_PARAM_IDS
-  # JUCE_FORCE_LEGACY_PARAMETER_AUTOMATION_TYPE
-  # JUCE_USE_STUDIO_ONE_COMPATIBLE_PARAMETERS
-  # JUCE_AU_WRAPPERS_SAVE_PROGRAM_STATES
-  # JUCE_STANDALONE_FILTER_WINDOW_USE_KIOSK_MODE
-)
-
-jucer_project_module(
-  juce_audio_processors
-  PATH "${JUCE_MODULES_GLOBAL_PATH}"
-  # JUCE_PLUGINHOST_VST
-  # JUCE_PLUGINHOST_VST3
-  # JUCE_PLUGINHOST_AU
-  # JUCE_PLUGINHOST_LADSPA
-  # JUCE_PLUGINHOST_LV2
-  # JUCE_PLUGINHOST_ARA
-  # JUCE_CUSTOM_VST3_SDK
-)
-
-jucer_project_module(
-  juce_audio_utils
-  PATH "${JUCE_MODULES_GLOBAL_PATH}"
-  # JUCE_USE_CDREADER
-  # JUCE_USE_CDBURNER
-)
-
-jucer_project_module(
-  juce_core
-  PATH "${JUCE_MODULES_GLOBAL_PATH}"
-  # JUCE_FORCE_DEBUG
-  # JUCE_LOG_ASSERTIONS
-  # JUCE_CHECK_MEMORY_LEAKS
-  # JUCE_DONT_AUTOLINK_TO_WIN32_LIBRARIES
-  # JUCE_INCLUDE_ZLIB_CODE
-  # JUCE_USE_CURL
-  # JUCE_LOAD_CURL_SYMBOLS_LAZILY
-  # JUCE_CATCH_UNHANDLED_EXCEPTIONS
-  # JUCE_ALLOW_STATIC_NULL_VARIABLES
-  JUCE_STRICT_REFCOUNTEDPOINTER ON
-  # JUCE_ENABLE_ALLOCATION_HOOKS
-)
-
-jucer_project_module(
-  juce_data_structures
-  PATH "${JUCE_MODULES_GLOBAL_PATH}"
-)
-
-jucer_project_module(
-  juce_events
-  PATH "${JUCE_MODULES_GLOBAL_PATH}"
-  # JUCE_EXECUTE_APP_SUSPEND_ON_BACKGROUND_TASK
-)
-
-jucer_project_module(
-  juce_graphics
-  PATH "${JUCE_MODULES_GLOBAL_PATH}"
-  # JUCE_USE_COREIMAGE_LOADER
-  # JUCE_USE_DIRECTWRITE
-  # JUCE_DISABLE_COREGRAPHICS_FONT_SMOOTHING
-)
-
-jucer_project_module(
-  juce_gui_basics
-  PATH "${JUCE_MODULES_GLOBAL_PATH}"
-  # JUCE_ENABLE_REPAINT_DEBUGGING
-  # JUCE_USE_XRANDR
-  # JUCE_USE_XINERAMA
-  # JUCE_USE_XSHM
-  # JUCE_USE_XRENDER
-  # JUCE_USE_XCURSOR
-  # JUCE_WIN_PER_MONITOR_DPI_AWARE
-)
-
-jucer_project_module(
-  juce_gui_extra
-  PATH "${JUCE_MODULES_GLOBAL_PATH}"
-  # JUCE_WEB_BROWSER
-  # JUCE_USE_WIN_WEBVIEW2
-  # JUCE_ENABLE_LIVE_CONSTANT_EDITOR
-)
-
-jucer_export_target(
-  "Xcode (macOS)"
-  TARGET_PROJECT_FOLDER "Builds/MacOSX" # used by HEADER_SEARCH_PATHS
-  # VST3_SDK_FOLDER
-)
-
-jucer_export_target_configuration(
-  "Xcode (macOS)"
-  NAME "Debug"
-  DEBUG_MODE ON
-  BINARY_NAME "GainPlugin"
-  OPTIMISATION "-O0 (no optimisation)"
-)
-
-jucer_export_target_configuration(
-  "Xcode (macOS)"
-  NAME "Release"
-  DEBUG_MODE OFF
-  BINARY_NAME "GainPlugin"
-  OPTIMISATION "-O3 (fastest with safe optimisations)"
-)
-
-jucer_export_target(
-  "Visual Studio 2022"
-  TARGET_PROJECT_FOLDER "Builds/VisualStudio2022" # used by HEADER_SEARCH_PATHS
-  # VST3_SDK_FOLDER
-)
-
-jucer_export_target_configuration(
-  "Visual Studio 2022"
-  NAME "Debug"
-  DEBUG_MODE ON
-  BINARY_NAME "GainPlugin"
-  OPTIMISATION "No optimisation"
-)
-
-jucer_export_target_configuration(
-  "Visual Studio 2022"
-  NAME "Release"
-  DEBUG_MODE OFF
-  BINARY_NAME "GainPlugin"
-  OPTIMISATION "Maximise speed"
-)
-
-jucer_project_end()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-#add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/../../libraries/NeuralAmpModelerCore" "${CMAKE_BINARY_DIR}/NeuralAmpModelerCore")
-#add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/../../libraries/AudioDSPTools" "${CMAKE_BINARY_DIR}/AudioDSPTools")
 add_definitions(-DJUCE_MODAL_LOOPS_PERMITTED=1)
 
 target_link_libraries(GainPlugin_Shared_Code PUBLIC NAM)
 
-if(MSVC)
- #   set_target_properties(GainPlugin_Shared_Code PROPERTIES VS_GLOBAL_UseIntelIPP "Sequential") # Parallel_Static
-endif(MSVC)
-#target_link_libraries(GainPlugin_Shared_Code PUBLIC
-#        juce::juce_recommended_config_flags
-#        juce::juce_recommended_lto_flags
-#        juce::juce_recommended_warning_flags)
-#target_link_libraries(GainPlugin_Shared_Code PUBLIC ipp)
+
 target_link_libraries(GainPlugin_Shared_Code PUBLIC AudioDSPTools)
 
 add_custom_command(TARGET GainPlugin_VST3 POST_BUILD
