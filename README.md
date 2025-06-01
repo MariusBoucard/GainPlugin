@@ -3,6 +3,8 @@ NAME HAS TO CHANGE AS WELL
 
 A JUCE-based VST plugin that integrates the [Neural Amp Modeler (NAM)](https://github.com/sdatkinson/neural-amp-modeler) to deliver high-quality, neural-network-based amp simulation in a flexible and extensible audio plugin framework.
 
+![Amp Screenshot](ressources/amp.png)
+
 ## 🎯 Project Overview
 
 This project aims to bring the powerful capabilities of the Neural Amp Modeler into the JUCE ecosystem. By embedding NAM into a JUCE VST plugin, we enable real-time neural amplifier emulation within any modern DAW that supports VST3.
